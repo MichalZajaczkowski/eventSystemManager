@@ -1,9 +1,7 @@
 package com.example.eventsystemmanager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.eventsystemmanager.entity.UserAddress;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
@@ -11,7 +9,11 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAddress {
+@Builder
+public class UserAddressDto {
+
+    @NotBlank
+    private Long id;
     @NotBlank
     private String country;
     @NotBlank
@@ -24,4 +26,15 @@ public class UserAddress {
     private Integer localNumber;
     @NotBlank
     private Integer postCode;
+
+    public UserAddress toUserAddress() {
+        return new UserAddress(
+                id,
+                country,
+                city,
+                street,
+                buildingNumber,
+                localNumber,
+                postCode);
+    }
 }
