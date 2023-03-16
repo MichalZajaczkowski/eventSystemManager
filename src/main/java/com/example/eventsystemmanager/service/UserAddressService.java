@@ -5,7 +5,6 @@ import com.example.eventsystemmanager.entity.UserAddress;
 import com.example.eventsystemmanager.mapper.UserAddressMapper;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +14,8 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @RequiredArgsConstructor
 @Service
 public class UserAddressService {
-
-    @Autowired
     private final UserAddressRepository userAddressRepository;
-    private final UserAddressMapper mapper;
+    private final UserAddressMapper userAddressMapper;
 
     public List<UserAddressDto> findAll() {
         return userAddressRepository.findAll()
@@ -26,10 +23,14 @@ public class UserAddressService {
                 .map(this::toDto)
                 .toList();
     }
+    public UserAddressDto getById(Long id) {
+        return userAddressMapper.userAddressMapToDto(userAddressRepository.findById(id).orElse(null));
+    }
 
     private UserAddressDto toDto(UserAddress userAddress) {
         return UserAddressDto.builder()
                 .id(userAddress.getId())
+                .country(userAddress.getCountry())
                 .city(userAddress.getCity())
                 .street(userAddress.getStreet())
                 .buildingNumber(userAddress.getBuildingNumber())
@@ -41,7 +42,7 @@ public class UserAddressService {
 
     public UserAddressDto findById(Long id) {
         return userAddressRepository.findById(id)
-                .map(mapper::userAddressMapToDto)
+                .map(userAddressMapper::userAddressMapToDto)
                 .orElseThrow(() -> new IllegalArgumentException("UserAddress with id " + id + " does not exist"));
     }
 
@@ -62,7 +63,7 @@ public class UserAddressService {
         userAddress.setBuildingNumber(userAddressDto.getBuildingNumber());
         userAddress.setLocalNumber(userAddressDto.getLocalNumber());
         userAddress.setPostCode(userAddressDto.getPostCode());
-        mapper.userAddressMapToDto(userAddressRepository.save(userAddress));
+        userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddress));
     }
 
     public void partialUpdateUserAddress (UserAddressDto userAddressDto) {
@@ -86,6 +87,6 @@ public class UserAddressService {
         if (userAddressDto.getPostCode() != null) {
             userAddress.setPostCode(userAddressDto.getPostCode());
         }
-        mapper.userAddressMapToDto(userAddressRepository.save(userAddress));
+        userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddress));
     }
 }
