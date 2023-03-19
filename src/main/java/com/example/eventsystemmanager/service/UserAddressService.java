@@ -23,6 +23,7 @@ public class UserAddressService {
                 .map(this::toDto)
                 .toList();
     }
+
     public UserAddressDto getById(Long id) {
         return userAddressMapper.userAddressMapToDto(userAddressRepository.findById(id).orElse(null));
     }
@@ -43,7 +44,7 @@ public class UserAddressService {
     public UserAddressDto findById(Long id) {
         return userAddressRepository.findById(id)
                 .map(userAddressMapper::userAddressMapToDto)
-                .orElseThrow(() -> new IllegalArgumentException("UserAddress with id " + id + " does not exist"));
+                .orElseThrow(() -> new IllegalArgumentException("UserAddress with id " + id + " does not exist."));
     }
 
     public void createUserAddress(UserAddressDto userAddressDto) {
@@ -66,16 +67,16 @@ public class UserAddressService {
         userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddress));
     }
 
-    public void partialUpdateUserAddress (UserAddressDto userAddressDto) {
+    public void partialUpdateUserAddress(UserAddressDto userAddressDto) {
         UserAddress userAddress = userAddressRepository.findById(userAddressDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("UserAddress with id" + userAddressDto.getId() + "does not exist"));
-        if (userAddressDto.getCountry() !=null) {
+        if (userAddressDto.getCountry() != null) {
             userAddress.setCountry(userAddressDto.getCountry());
         }
         if (userAddressDto.getCity() != null) {
             userAddress.setCity(userAddressDto.getCity());
         }
-        if (userAddressDto.getStreet() !=null) {
+        if (userAddressDto.getStreet() != null) {
             userAddress.setStreet(userAddressDto.getStreet());
         }
         if (userAddressDto.getBuildingNumber() != null) {
@@ -87,6 +88,13 @@ public class UserAddressService {
         if (userAddressDto.getPostCode() != null) {
             userAddress.setPostCode(userAddressDto.getPostCode());
         }
-        userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddress));
+        userAddressRepository.save(userAddress);
+    }
+
+    public void deleteUserAddress(Long id) {
+        if (!id.equals(userAddressRepository.findById(id))) {
+            throw new IllegalArgumentException("UserAddress with id " + id + " does not exist");
+        }
+        userAddressRepository.deleteById(id);
     }
 }

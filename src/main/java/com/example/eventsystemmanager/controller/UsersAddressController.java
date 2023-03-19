@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.controller;
 
 import com.example.eventsystemmanager.dto.UserAddressDto;
+import com.example.eventsystemmanager.entity.UserAddress;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import com.example.eventsystemmanager.service.UserAddressService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,9 +45,9 @@ public class UsersAddressController {
             @ApiResponse(responseCode = "404", description = "Movie cannot be found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserAddressDto> getMovie(@Parameter(description = "Movie to be saved") @PathVariable Long id) {
+    public ResponseEntity<UserAddressDto> getUsersAddressById(@Parameter(description = "Movie to be saved") @PathVariable Long id) {
         UserAddressDto userAddressDto = userAddressService.findById(id);
-        log.info("Found userAddress: " + userAddressRepository.getById(id));
+        log.info("User address found: " + userAddressRepository.getById(id));
         return userAddressDto != null ? new ResponseEntity<>(HttpStatus.OK) : ResponseEntity.notFound().build();
     }
 //    @GetMapping("/{id}")
@@ -62,6 +63,27 @@ public class UsersAddressController {
         userAddressService.createUserAddress(userAddressDto);
         log.info("User address was created");
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping
+    public ResponseEntity<UserAddressDto> update(@RequestBody UserAddressDto userAddressDto) {
+        userAddressService.updateUserAddress(userAddressDto);
+        log.info("User address was updated");
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @PatchMapping
+    public ResponseEntity<UserAddressDto> partialUpdateUserAddress(@RequestBody UserAddressDto userAddressDto) {
+        userAddressService.partialUpdateUserAddress(userAddressDto);
+        log.info("User address was updated");
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<UserAddressDto> deleteUserAddress(@PathVariable Long id) {
+        userAddressService.deleteUserAddress(id);
+        log.info("User address was deleted");
+        return ResponseEntity.noContent().build();
     }
 }
 
