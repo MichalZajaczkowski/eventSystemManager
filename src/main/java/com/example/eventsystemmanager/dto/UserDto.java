@@ -1,19 +1,24 @@
 package com.example.eventsystemmanager.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.eventsystemmanager.entity.User;
+import com.example.eventsystemmanager.entity.UserAddress;
+import lombok.*;
 
-import javax.persistence.Column;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
+@Builder
 public class UserDto {
+
+    @NotBlank
+    private Long id;
+    @NotBlank
+    private UserAddressDto userAddress;
     @NotBlank
     private String userName;
     @NotBlank
@@ -25,4 +30,21 @@ public class UserDto {
     @Email
     private String email;
     private String phone;
+
+    public User toUser() {
+        return new User(
+                id,
+                userAddress.toUserAddress(),
+                userName,
+                userSurName,
+                login,
+                password,
+                email,
+                phone
+
+        );
+    }
+    public void setUserAddressToDto(UserAddress userAddress) {
+        this.userAddress = new UserAddressDto(userAddress);
+    }
 }
