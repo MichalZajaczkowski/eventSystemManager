@@ -5,13 +5,16 @@ import com.example.eventsystemmanager.entity.UserAddress;
 import com.example.eventsystemmanager.mapper.UserAddressMapper;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
+
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class UserAddressService {
     private final UserAddressRepository userAddressRepository;
@@ -91,10 +94,9 @@ public class UserAddressService {
         userAddressRepository.save(userAddress);
     }
 
-    public void deleteUserAddress(Long id) {
-        if (!id.equals(userAddressRepository.findById(id))) {
-            throw new IllegalArgumentException("UserAddress with id " + id + " does not exist");
-        }
-        userAddressRepository.deleteById(id);
+    public void removeAddress(Long userId) {
+        UserAddress userAddress = userAddressRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found."));
+        userAddressRepository.delete(userAddress);
     }
 }

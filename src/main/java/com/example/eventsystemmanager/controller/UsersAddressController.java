@@ -33,11 +33,12 @@ public class UsersAddressController {
         List<UserAddressDto> usersAddressDtoList = userAddressService.findAll();
         if (usersAddressDtoList.isEmpty()) {
             return ResponseEntity.notFound().build();
-        }else {
+        } else {
             log.info("UsersAddress returned: " + userAddressRepository.findAll());
             return ResponseEntity.ok(usersAddressDtoList);
         }
     }
+
     @Operation(summary = "Gets movie by id", description = "Get movie based on it's id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful response",
@@ -80,10 +81,10 @@ public class UsersAddressController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserAddressDto> deleteUserAddress(@PathVariable Long id) {
-        userAddressService.deleteUserAddress(id);
-        log.info("User address was deleted");
+    public ResponseEntity deleteAddress(@PathVariable Long id) {
+        userAddressService.removeAddress(id);
+        log.info("log:Address removed successfully.");
         return ResponseEntity.noContent().build();
+
     }
 }
-
