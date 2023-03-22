@@ -11,8 +11,8 @@ public class OpenAPIConfig {
     @Bean
     public OpenAPI springOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Artur API")
-                        .description("Moje API <3")
-                        .version("v1.1.1"));
+                .info(new Info().title("Michal API")
+                        .description("APIAPI")
+                        .version("v6.6.6"));
     }
 }

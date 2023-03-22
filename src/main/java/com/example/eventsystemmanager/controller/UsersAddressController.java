@@ -25,7 +25,6 @@ import java.util.List;
 @RequestMapping("/userAddress")
 public class UsersAddressController {
     private final UserAddressRepository userAddressRepository;
-
     private final UserAddressService userAddressService;
 
     @GetMapping()
@@ -34,21 +33,21 @@ public class UsersAddressController {
         if (usersAddressDtoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            log.info("UsersAddress returned: " + userAddressRepository.findAll());
+            log.info("UsersAddress returned: " + userAddressService.findAll());
             return ResponseEntity.ok(usersAddressDtoList);
         }
     }
 
-    @Operation(summary = "Gets movie by id", description = "Get movie based on it's id")
+    @Operation(summary = "Gets userAddress by id", description = "Get userAddress based on it's id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful response",
                     content = @Content(schema = @Schema(implementation = UserAddressDto.class))),
-            @ApiResponse(responseCode = "404", description = "Movie cannot be found")
+            @ApiResponse(responseCode = "404", description = "userAddress cannot be found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserAddressDto> getUsersAddressById(@Parameter(description = "Movie to be saved") @PathVariable Long id) {
+    public ResponseEntity<UserAddressDto> getUsersAddressById(@Parameter(description = "userAddress to be saved") @PathVariable Long id) {
         UserAddressDto userAddressDto = userAddressService.findById(id);
-        log.info("User address found: " + userAddressRepository.getById(id));
+        log.info("User address found: " + userAddressService.findById(id));
         return userAddressDto != null ? new ResponseEntity<>(HttpStatus.OK) : ResponseEntity.notFound().build();
     }
 //    @GetMapping("/{id}")

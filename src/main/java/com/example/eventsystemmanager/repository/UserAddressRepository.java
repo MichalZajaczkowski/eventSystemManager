@@ -20,8 +20,6 @@ public interface UserAddressRepository extends JpaRepository<UserAddress,Long> {
 
     UserAddress save(UserAddress userAddress);
 
-    UserAddress getById(Long id);
-
     void deleteById(Long id);
 
     void deleteAll();

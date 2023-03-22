@@ -11,7 +11,8 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserDto {
 
@@ -22,7 +23,7 @@ public class UserDto {
     @NotBlank
     private String userName;
     @NotBlank
-    private String userSurName;
+    private String userSurname;
     @NotBlank
     private String login;
     @NotBlank
@@ -36,7 +37,7 @@ public class UserDto {
                 id,
                 userAddress.toUserAddress(),
                 userName,
-                userSurName,
+                userSurname,
                 login,
                 password,
                 email,

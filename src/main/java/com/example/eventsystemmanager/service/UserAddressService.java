@@ -26,11 +26,6 @@ public class UserAddressService {
                 .map(this::toDto)
                 .toList();
     }
-
-    public UserAddressDto getById(Long id) {
-        return userAddressMapper.userAddressMapToDto(userAddressRepository.findById(id).orElse(null));
-    }
-
     private UserAddressDto toDto(UserAddress userAddress) {
         return UserAddressDto.builder()
                 .id(userAddress.getId())
@@ -94,9 +89,9 @@ public class UserAddressService {
         userAddressRepository.save(userAddress);
     }
 
-    public void removeAddress(Long userId) {
-        UserAddress userAddress = userAddressRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found."));
+    public void removeAddress(Long id) {
+        UserAddress userAddress = userAddressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User address with ID " + id + " not found."));
         userAddressRepository.delete(userAddress);
     }
 }
