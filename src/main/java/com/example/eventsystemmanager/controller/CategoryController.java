@@ -30,14 +30,14 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryById(Long id) {
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
         CategoryDto category = categoryService.findById(id);
         log.info("Log: Category found: " + categoryService.findById(id));
         return category != null ? ResponseEntity.ok(category): ResponseEntity.notFound().build();
     }
 
     @PostMapping()
-    public ResponseEntity<CategoryDto> saveCategory(@Valid @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryDto categoryDto) {
         categoryService.addCategory(categoryDto);
         log.info("Log: Category was created");
         return new ResponseEntity<>(HttpStatus.CREATED);

@@ -19,8 +19,6 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
 
     CategoryEntity save(CategoryEntity category);
 
-    CategoryEntity getById(Long id);
-
     void deleteById(Long id);
 
     void deleteAll();

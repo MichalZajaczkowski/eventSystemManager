@@ -46,11 +46,13 @@ public class CategoryService {
     }
 
     public void addCategory(CategoryDto categoryDto) {
-        if (categoryRepository.findById(id).isPresent()) {
-            throw new IllegalArgumentException(CATEGOTYWITHIDSTATEMENT);
-        } else {
-            categoryRepository.save(categoryDto.toCategory());
+        if (categoryRepository.findByDescription(categoryDto.getDescription()).isPresent()) {
+            log.info("Log: Category with description '" + categoryDto.getDescription() + "' already exists");
+            throw new NonUniqueResultException("Category with description '" + categoryDto.getDescription() + "' already exists");
         }
+        CategoryEntity categoryEntity = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException(CATEGOTYWITHIDSTATEMENT));
+        categoryRepository.save(categoryDto.toCategory());
     }
 
     public void updateCategory(CategoryDto categoryDto) {
