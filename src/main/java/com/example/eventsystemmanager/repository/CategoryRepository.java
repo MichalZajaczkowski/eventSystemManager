@@ -1,8 +1,8 @@
 package com.example.eventsystemmanager.repository;
 
-import com.example.eventsystemmanager.entity.UserAddressEntity;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.eventsystemmanager.entity.CategoryEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -10,20 +10,22 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
-public interface UserAddressRepository extends JpaRepository<UserAddressEntity,Long> {
+public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 
-    List<UserAddressEntity> findAll();
+    List<CategoryEntity> findAll();
 
-    Optional<UserAddressEntity> findById(Long id);
+    Optional<CategoryEntity> findById(Long id);
 
-    UserAddressEntity save(UserAddressEntity userAddressEntity);
+    CategoryEntity save(CategoryEntity category);
+
+    CategoryEntity getById(Long id);
 
     void deleteById(Long id);
 
     void deleteAll();
 
+    Optional<Object> findByDescription(String description);
     Optional<Object> findById(SingularAttribute<AbstractPersistable, Serializable> id);
 
 }

@@ -1,6 +1,6 @@
 package com.example.eventsystemmanager.dto;
 
-import com.example.eventsystemmanager.entity.UserAddress;
+import com.example.eventsystemmanager.entity.UserAddressEntity;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -27,18 +27,18 @@ public class UserAddressDto {
     @NotBlank
     private Integer postCode;
 
-    public UserAddressDto(UserAddress userAddress) {
-        this.id = userAddress.getId();
-        this.country = userAddress.getCountry();
-        this.city = userAddress.getCity();
-        this.street = userAddress.getStreet();
-        this.buildingNumber = userAddress.getBuildingNumber();
-        this.localNumber = userAddress.getLocalNumber();
-        this.postCode = userAddress.getPostCode();
+    public UserAddressDto(UserAddressEntity userAddressEntity) {
+        this.id = userAddressEntity.getId();
+        this.country = userAddressEntity.getCountry();
+        this.city = userAddressEntity.getCity();
+        this.street = userAddressEntity.getStreet();
+        this.buildingNumber = userAddressEntity.getBuildingNumber();
+        this.localNumber = userAddressEntity.getLocalNumber();
+        this.postCode = userAddressEntity.getPostCode();
     }
 
-    public UserAddress toUserAddress() {
-        return new UserAddress(
+    public UserAddressEntity toUserAddress() {
+        return new UserAddressEntity(
                 id,
                 country,
                 city,

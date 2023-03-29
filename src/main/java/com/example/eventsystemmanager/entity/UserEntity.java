@@ -12,7 +12,7 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "user_address_id")
-    private UserAddress userAddress;
+    private UserAddressEntity userAddressEntity;
 
     @Column(name = "user_name")
     private String userName;

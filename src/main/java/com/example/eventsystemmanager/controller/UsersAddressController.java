@@ -1,7 +1,6 @@
 package com.example.eventsystemmanager.controller;
 
 import com.example.eventsystemmanager.dto.UserAddressDto;
-import com.example.eventsystemmanager.entity.UserAddress;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import com.example.eventsystemmanager.service.UserAddressService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RequiredArgsConstructor
