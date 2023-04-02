@@ -1,7 +1,7 @@
 package com.example.eventsystemmanager.service;
 
 import com.example.eventsystemmanager.dto.UserAddressDto;
-import com.example.eventsystemmanager.entity.UserAddress;
+import com.example.eventsystemmanager.entity.UserAddressEntity;
 import com.example.eventsystemmanager.mapper.UserAddressMapper;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +26,15 @@ public class UserAddressService {
                 .map(this::toDto)
                 .toList();
     }
-    private UserAddressDto toDto(UserAddress userAddress) {
+    private UserAddressDto toDto(UserAddressEntity userAddressEntity) {
         return UserAddressDto.builder()
-                .id(userAddress.getId())
-                .country(userAddress.getCountry())
-                .city(userAddress.getCity())
-                .street(userAddress.getStreet())
-                .buildingNumber(userAddress.getBuildingNumber())
-                .localNumber(userAddress.getLocalNumber())
-                .postCode(userAddress.getPostCode())
+                .id(userAddressEntity.getId())
+                .country(userAddressEntity.getCountry())
+                .city(userAddressEntity.getCity())
+                .street(userAddressEntity.getStreet())
+                .buildingNumber(userAddressEntity.getBuildingNumber())
+                .localNumber(userAddressEntity.getLocalNumber())
+                .postCode(userAddressEntity.getPostCode())
                 .build();
 
     }
@@ -54,44 +54,44 @@ public class UserAddressService {
     }
 
     public void updateUserAddress(UserAddressDto userAddressDto) {
-        UserAddress userAddress = userAddressRepository.findById(userAddressDto.getId())
+        UserAddressEntity userAddressEntity = userAddressRepository.findById(userAddressDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("UserAddress with id" + userAddressDto.getId() + "does not exist"));
-        userAddress.setCountry(userAddressDto.getCountry());
-        userAddress.setCity(userAddressDto.getCity());
-        userAddress.setStreet(userAddressDto.getStreet());
-        userAddress.setBuildingNumber(userAddressDto.getBuildingNumber());
-        userAddress.setLocalNumber(userAddressDto.getLocalNumber());
-        userAddress.setPostCode(userAddressDto.getPostCode());
-        userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddress));
+        userAddressEntity.setCountry(userAddressDto.getCountry());
+        userAddressEntity.setCity(userAddressDto.getCity());
+        userAddressEntity.setStreet(userAddressDto.getStreet());
+        userAddressEntity.setBuildingNumber(userAddressDto.getBuildingNumber());
+        userAddressEntity.setLocalNumber(userAddressDto.getLocalNumber());
+        userAddressEntity.setPostCode(userAddressDto.getPostCode());
+        userAddressMapper.userAddressMapToDto(userAddressRepository.save(userAddressEntity));
     }
 
     public void partialUpdateUserAddress(UserAddressDto userAddressDto) {
-        UserAddress userAddress = userAddressRepository.findById(userAddressDto.getId())
+        UserAddressEntity userAddressEntity = userAddressRepository.findById(userAddressDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("UserAddress with id" + userAddressDto.getId() + "does not exist"));
         if (userAddressDto.getCountry() != null) {
-            userAddress.setCountry(userAddressDto.getCountry());
+            userAddressEntity.setCountry(userAddressDto.getCountry());
         }
         if (userAddressDto.getCity() != null) {
-            userAddress.setCity(userAddressDto.getCity());
+            userAddressEntity.setCity(userAddressDto.getCity());
         }
         if (userAddressDto.getStreet() != null) {
-            userAddress.setStreet(userAddressDto.getStreet());
+            userAddressEntity.setStreet(userAddressDto.getStreet());
         }
         if (userAddressDto.getBuildingNumber() != null) {
-            userAddress.setBuildingNumber(userAddressDto.getBuildingNumber());
+            userAddressEntity.setBuildingNumber(userAddressDto.getBuildingNumber());
         }
         if (userAddressDto.getLocalNumber() != null) {
-            userAddress.setLocalNumber(userAddressDto.getLocalNumber());
+            userAddressEntity.setLocalNumber(userAddressDto.getLocalNumber());
         }
         if (userAddressDto.getPostCode() != null) {
-            userAddress.setPostCode(userAddressDto.getPostCode());
+            userAddressEntity.setPostCode(userAddressDto.getPostCode());
         }
-        userAddressRepository.save(userAddress);
+        userAddressRepository.save(userAddressEntity);
     }
 
     public void removeAddress(Long id) {
-        UserAddress userAddress = userAddressRepository.findById(id)
+        UserAddressEntity userAddressEntity = userAddressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User address with ID " + id + " not found."));
-        userAddressRepository.delete(userAddress);
+        userAddressRepository.delete(userAddressEntity);
     }
 }

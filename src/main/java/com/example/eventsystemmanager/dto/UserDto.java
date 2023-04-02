@@ -1,7 +1,7 @@
 package com.example.eventsystemmanager.dto;
 
-import com.example.eventsystemmanager.entity.User;
-import com.example.eventsystemmanager.entity.UserAddress;
+import com.example.eventsystemmanager.entity.UserEntity;
+import com.example.eventsystemmanager.entity.UserAddressEntity;
 import lombok.*;
 
 
@@ -32,8 +32,8 @@ public class UserDto {
     private String email;
     private String phone;
 
-    public User toUser() {
-        return new User(
+    public UserEntity toUser() {
+        return new UserEntity(
                 id,
                 userAddress.toUserAddress(),
                 userName,
@@ -45,7 +45,7 @@ public class UserDto {
 
         );
     }
-    public void setUserAddressToDto(UserAddress userAddress) {
-        this.userAddress = new UserAddressDto(userAddress);
+    public void setUserAddressToDto(UserAddressEntity userAddressEntity) {
+        this.userAddress = new UserAddressDto(userAddressEntity);
     }
 }
