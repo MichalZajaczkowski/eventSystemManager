@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.entity;
 
+import com.example.eventsystemmanager.enums.StatusType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,7 +17,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false, name = "id")
+    @Column(unique = true, name = "id")
     private Long id;
 
     @ManyToOne
@@ -39,4 +40,6 @@ public class UserEntity {
 
     @Column(name = "phone")
     private String phone;
+    @Enumerated(EnumType.STRING)
+    private StatusType status;
 }

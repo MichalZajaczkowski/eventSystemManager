@@ -1,8 +1,6 @@
 package com.example.eventsystemmanager.controller;
 
-import com.example.eventsystemmanager.dto.UserAddressDto;
 import com.example.eventsystemmanager.dto.UserDto;
-import com.example.eventsystemmanager.service.UserAddressService;
 import com.example.eventsystemmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,19 +9,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Address;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -58,11 +53,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User cannot be created"),
             @ApiResponse(responseCode = "500", description = "User cannot be created")
     })
-    @PostMapping()
+    @PostMapping("/create")
     public ResponseEntity<UserDto> save(@RequestBody UserDto userDto) {
-        userService.createUser(userDto);
+        UserDto savedUserDto = userService.createUser(userDto);
         log.info("Log: User was created");
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+        //return ResponseEntity.created(URI.create("/api/v1/users/" + savedUserDto.getId())).body(savedUserDto);
     }
 
 
@@ -86,4 +82,15 @@ public class UserController {
         log.info("log: User removed successfully.");
         return ResponseEntity.noContent().build();
     }
+
+//    @PostMapping("/{userId}/status")
+//    public ResponseEntity<UserDto> addStatusToUser(@PathVariable Long userId, @RequestBody StatusDto statusDto) {
+//        UserDto user = userService.findById(userId);
+//        if (user == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        StatusType statusType = StatusType.valueOf(statusDto.getStatusType());
+//        userService.setStatus(user, statusType);
+//        return ResponseEntity.ok(user);
+//    }
 }
