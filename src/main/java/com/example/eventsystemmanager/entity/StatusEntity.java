@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.entity;
 
+import com.example.eventsystemmanager.enums.StatusType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,7 +19,10 @@ public class StatusEntity {
 
     @Column(nullable = false)
     private String name;
-
+    @Column(nullable = false)
+    private Integer value;
     @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    private StatusType statusType;
 }

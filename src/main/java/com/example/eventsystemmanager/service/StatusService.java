@@ -37,4 +37,15 @@ public class StatusService {
             return statusDto;
         }).collect(Collectors.toList());
     }
+
+    public void updateStatus(String name, StatusDto newStatusDto) {
+        StatusType statusType = StatusType.fromName(name);
+        StatusEntity statusEntity = statusRepository.findByValue(statusType.getValue());
+        if (statusEntity == null) {
+            throw new IllegalArgumentException("Nieprawidłowa nazwa statusu: " + name);
+        }
+        statusEntity.setName(newStatusDto.getName());
+        statusEntity.setDescription(newStatusDto.getDescription());
+        statusRepository.save(statusEntity);
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.CheckForNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -132,12 +133,12 @@ public class UserService {
         userRepository.delete(userEntity);
     }
 
-    public void addStatusToUser(Long userId, String statusName) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym identyfikatorze"));
-        user.setStatus(StatusType.fromName(statusName));
+    public void setStatus(UserDto userDto, StatusType statusType) {
+        UserEntity user = userRepository.findById(userDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found."));
+        user.setStatus(statusType);
         userRepository.save(user);
     }
+
 
     private UserDto mapUserToDto(UserEntity userEntity) {
         UserDto userDto = new UserDto();
