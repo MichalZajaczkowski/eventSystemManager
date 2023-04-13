@@ -1,10 +1,12 @@
 package com.example.eventsystemmanager.service;
 
-import com.example.eventsystemmanager.dto.UserAddressDto;
 import com.example.eventsystemmanager.dto.UserDto;
+import com.example.eventsystemmanager.entity.StatusEntity;
 import com.example.eventsystemmanager.entity.UserEntity;
 import com.example.eventsystemmanager.entity.UserAddressEntity;
+import com.example.eventsystemmanager.enums.StatusType;
 import com.example.eventsystemmanager.mapper.UserMapper;
+import com.example.eventsystemmanager.repository.StatusRepository;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import com.example.eventsystemmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,37 +23,25 @@ public class UserService {
 
     private static final String USERADDRESSWITHIDSTATEMENT = "UserAddress with id " + id + " does not exist.";
     private final UserAddressRepository userAddressRepository;
-
     private final UserRepository userRepository;
+
+    private final StatusRepository statusRepository;
     private final UserMapper userMapper;
 
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .map(this::mapUserToDto)
                 .toList();
-    }
-
-    private UserDto toDto(UserEntity userEntity) {
-        return  UserDto.builder()
-                .id(userEntity.getId())
-                .userName(userEntity.getUserName())
-                .userSurname(userEntity.getUserSurname())
-                .login(userEntity.getLogin())
-                .password(userEntity.getPassword())
-                .email(userEntity.getEmail())
-                .phone(userEntity.getPhone())
-                .userAddress(new UserAddressDto())
-                .build();
     }
 
     public UserDto findById(Long id) {
         return userRepository.findById(id)
-                .map(userMapper::userMapToDto)
+                .map(this::mapUserToDto)
                 .orElseThrow(() -> new IllegalArgumentException(USERADDRESSWITHIDSTATEMENT));
     }
 
-    public void createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto) {
         if (userDto.getUserAddress() != null && userDto.getUserAddress().getId() != null) {
             if (userAddressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
                 throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
@@ -68,6 +58,7 @@ public class UserService {
             userAddressRepository.save(userEntity.getUserAddressEntity());
             userRepository.save(userEntity);
         }
+        return userDto;
     }
 
     public void updateUser(UserDto userDto) {
@@ -140,23 +131,25 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User  with ID " + id + " not found."));
         userRepository.delete(userEntity);
     }
+
+    public void addStatusToUser(Long userId, String statusName) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym identyfikatorze"));
+        user.setStatus(StatusType.fromName(statusName));
+        userRepository.save(user);
+    }
+
+    private UserDto mapUserToDto(UserEntity userEntity) {
+        UserDto userDto = new UserDto();
+        userDto.setId(userEntity.getId());
+        userDto.setUserName(userEntity.getUserName());
+        userDto.setUserSurname(userEntity.getUserSurname());
+        userDto.setLogin(userEntity.getLogin());
+        userDto.setPassword(userEntity.getPassword());
+        userDto.setEmail(userEntity.getEmail());
+        userDto.setPhone(userEntity.getPhone());
+        userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
+        userDto.setStatus(userEntity.getStatus());
+        return userDto;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

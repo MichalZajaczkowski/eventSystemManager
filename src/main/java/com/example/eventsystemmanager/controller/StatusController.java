@@ -1,7 +1,7 @@
 package com.example.eventsystemmanager.controller;
 
 import com.example.eventsystemmanager.dto.StatusDto;
-import com.example.eventsystemmanager.enums.UserStatus;
+import com.example.eventsystemmanager.enums.StatusType;
 import com.example.eventsystemmanager.service.StatusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +30,8 @@ public class StatusController {
     @GetMapping("/{name}")
     public ResponseEntity<Integer> getStatusValue(@PathVariable String name) {
         try {
-            UserStatus userStatus = UserStatus.fromName(name);
-            return ResponseEntity.ok(userStatus.getValue());
+            StatusType statusType = StatusType.fromName(name);
+            return ResponseEntity.ok(statusType.getValue());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

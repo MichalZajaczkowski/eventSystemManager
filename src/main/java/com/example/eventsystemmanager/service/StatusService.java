@@ -2,7 +2,7 @@ package com.example.eventsystemmanager.service;
 
 import com.example.eventsystemmanager.dto.StatusDto;
 import com.example.eventsystemmanager.entity.StatusEntity;
-import com.example.eventsystemmanager.enums.UserStatus;
+import com.example.eventsystemmanager.enums.StatusType;
 import com.example.eventsystemmanager.repository.StatusRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +20,8 @@ public class StatusService {
 
     public Integer getStatusValue(String name) {
         try {
-            UserStatus userStatus = UserStatus.fromName(name);
-            return userStatus.getValue();
+            StatusType statusType = StatusType.fromName(name);
+            return statusType.getValue();
         } catch (IllegalArgumentException e) {
             return -1; // wartość nieznana
         }
