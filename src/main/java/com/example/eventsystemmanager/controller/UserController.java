@@ -104,4 +104,16 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/status/name/{statusName}")
+    public List<UserDto> getUsersByStatusName(@PathVariable String statusName) {
+        return userService.getUsersByStatusName(statusName);
+    }
+
+
+    @GetMapping("/status/value/{statusValue}")
+    public List<UserDto> getUsersByStatusValue(@PathVariable Integer statusValue) {
+        return userService.getUsersByStatusValue(statusValue);
+    }
+
+
 }

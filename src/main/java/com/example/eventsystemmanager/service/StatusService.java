@@ -18,12 +18,21 @@ public class StatusService {
         this.statusRepository = statusRepository;
     }
 
-    public Integer getStatusValue(String name) {
+    public Integer getStatusValue(Integer value) {
         try {
-            StatusType statusType = StatusType.fromName(name);
+            StatusType statusType = StatusType.fromValue(value);
             return statusType.getValue();
         } catch (IllegalArgumentException e) {
             return -1; // wartość nieznana
+        }
+    }
+
+    public String getStatusName(String name) {
+        try {
+            StatusType statusType = StatusType.fromName(name);
+            return statusType.getName();
+        } catch (IllegalArgumentException e) {
+            return "Unknown"; // wartość nieznana
         }
     }
 

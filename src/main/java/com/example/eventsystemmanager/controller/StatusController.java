@@ -27,11 +27,21 @@ public class StatusController {
         return ResponseEntity.ok(statusDtos);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Integer> getStatusValue(@PathVariable String name) {
+    @GetMapping("/{value}")
+    public ResponseEntity<Integer> getStatusValue(@PathVariable Integer value) {
+        try {
+            StatusType statusType = StatusType.fromValue(value);
+            return ResponseEntity.ok(statusType.getValue());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/name")
+    public ResponseEntity<String> getStatusName(@PathVariable String name) {
         try {
             StatusType statusType = StatusType.fromName(name);
-            return ResponseEntity.ok(statusType.getValue());
+            return ResponseEntity.ok(statusType.getName());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
