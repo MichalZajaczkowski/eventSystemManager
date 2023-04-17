@@ -2,7 +2,7 @@ package com.example.eventsystemmanager.dto;
 
 import com.example.eventsystemmanager.entity.UserEntity;
 import com.example.eventsystemmanager.entity.UserAddressEntity;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.enums.UserStatus;
 import lombok.*;
 
 
@@ -32,7 +32,7 @@ public class UserDto {
     @Email
     private String email;
     private String phone;
-    private StatusType status;
+    private UserStatus userStatus;
 
     public UserEntity toUser() {
         return new UserEntity(
@@ -44,7 +44,7 @@ public class UserDto {
                 password,
                 email,
                 phone,
-                StatusType.NIEAKTYWNY
+                UserStatus.NIEAKTYWNY
         );
     }
     public void setUserAddressToDto(UserAddressEntity userAddressEntity) {

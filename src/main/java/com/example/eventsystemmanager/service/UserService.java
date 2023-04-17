@@ -1,19 +1,22 @@
 package com.example.eventsystemmanager.service;
 
 import com.example.eventsystemmanager.dto.UserDto;
-import com.example.eventsystemmanager.entity.StatusEntity;
-import com.example.eventsystemmanager.entity.UserEntity;
 import com.example.eventsystemmanager.entity.UserAddressEntity;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.entity.UserEntity;
+import com.example.eventsystemmanager.enums.UserStatus;
 import com.example.eventsystemmanager.mapper.UserMapper;
 import com.example.eventsystemmanager.repository.StatusRepository;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
 import com.example.eventsystemmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.NamingConventions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -27,6 +30,15 @@ public class UserService {
 
     private final StatusRepository statusRepository;
     private final UserMapper userMapper;
+    private final ModelMapper modelMapper;
+    @PostConstruct
+    public void configureMapper() {
+        modelMapper.getConfiguration()
+                .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR)
+                .setDestinationNamingConvention(NamingConventions.JAVABEANS_ACCESSOR)
+                .setSkipNullEnabled(true)
+                .setAmbiguityIgnored(true);
+    }
 
     public List<UserDto> findAll() {
         return userRepository.findAll()
@@ -132,12 +144,26 @@ public class UserService {
         userRepository.delete(userEntity);
     }
 
-    public void addStatusToUser(Long userId, String statusName) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym identyfikatorze"));
-        user.setStatus(StatusType.fromName(statusName));
+    public void setStatus(UserDto userDto, UserStatus userStatus) {
+        UserEntity user = userRepository.findById(userDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found."));
+        user.setUserStatus(userStatus);
         userRepository.save(user);
     }
+    public List<UserDto> getUsersByStatusName(String statusName) {
+        UserStatus userStatus = UserStatus.fromName(statusName);
+        List<UserEntity> users = userRepository.findByUserStatus(userStatus);
+        return users.stream()
+                .map(userMapper::userMapToDto)
+                .collect(Collectors.toList());
+    }
+    public List<UserDto> getUsersByStatusValue(Integer statusValue) {
+        UserStatus userStatus = UserStatus.fromValue(statusValue);
+        List<UserEntity> users = userRepository.findByUserStatus(userStatus);
+        return users.stream()
+                .map(userMapper::userMapToDto)
+                .collect(Collectors.toList());
+    }
+
 
     private UserDto mapUserToDto(UserEntity userEntity) {
         UserDto userDto = new UserDto();
@@ -149,7 +175,7 @@ public class UserService {
         userDto.setEmail(userEntity.getEmail());
         userDto.setPhone(userEntity.getPhone());
         userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
-        userDto.setStatus(userEntity.getStatus());
+        userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
 }

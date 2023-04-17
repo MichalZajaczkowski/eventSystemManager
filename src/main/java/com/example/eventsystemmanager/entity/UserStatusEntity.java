@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.entity;
 
+import com.example.eventsystemmanager.enums.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "status")
 @Entity
-public class StatusEntity {
+public class UserStatusEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +19,10 @@ public class StatusEntity {
 
     @Column(nullable = false)
     private String name;
-
+    @Column(nullable = false)
+    private Integer value;
     @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
+    private UserStatus userStatus;
 }

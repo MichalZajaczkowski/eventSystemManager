@@ -1,7 +1,10 @@
 package com.example.eventsystemmanager.controller;
 
+import com.example.eventsystemmanager.dto.UserStatusDto;
 import com.example.eventsystemmanager.dto.UserDto;
+import com.example.eventsystemmanager.enums.UserStatus;
 import com.example.eventsystemmanager.service.UserService;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,14 +86,34 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping("/{userId}/status")
-//    public ResponseEntity<UserDto> addStatusToUser(@PathVariable Long userId, @RequestBody StatusDto statusDto) {
-//        UserDto user = userService.findById(userId);
-//        if (user == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        StatusType statusType = StatusType.valueOf(statusDto.getStatusType());
-//        userService.setStatus(user, statusType);
-//        return ResponseEntity.ok(user);
-//    }
+    @ApiOperation(value = "Changes user status", notes = "Changes status of user with specified ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User status changed successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PutMapping("/{id}/status")
+    public ResponseEntity<UserDto> changeUserStatus(@PathVariable Long id, @RequestBody UserStatusDto userStatusDto) {
+        UserDto user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserStatus userStatus = UserStatus.valueOf(String.valueOf(userStatusDto.getUserStatus()));
+        userService.setStatus(user, userStatus);
+        log.info("User status changed successfully.");
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/status/name/{statusName}")
+    public List<UserDto> getUsersByStatusName(@PathVariable String statusName) {
+        return userService.getUsersByStatusName(statusName);
+    }
+
+
+    @GetMapping("/status/value/{statusValue}")
+    public List<UserDto> getUsersByStatusValue(@PathVariable Integer statusValue) {
+        return userService.getUsersByStatusValue(statusValue);
+    }
+
+
 }
