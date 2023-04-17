@@ -3,6 +3,7 @@ package com.example.eventsystemmanager.user;
 import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
 import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
     @NotBlank
@@ -34,6 +36,7 @@ public class UserDto {
     private String phone;
     private UserStatus userStatus;
 
+
     public UserEntity toUser() {
         return new UserEntity(
                 id,
@@ -49,5 +52,9 @@ public class UserDto {
     }
     public void setUserAddressToDto(UserAddressEntity userAddressEntity) {
         this.userAddress = new UserAddressDto(userAddressEntity);
+    }
+
+    public void setUserAddressToDto(Long userAddressEntityId) {
+        this.userAddress = new UserAddressDto(userAddressEntityId);
     }
 }

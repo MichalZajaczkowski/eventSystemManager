@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.user.userAddress;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserAddressDto {
 
     @NotBlank
@@ -34,6 +36,10 @@ public class UserAddressDto {
         this.buildingNumber = userAddressEntity.getBuildingNumber();
         this.localNumber = userAddressEntity.getLocalNumber();
         this.postCode = userAddressEntity.getPostCode();
+    }
+
+    public UserAddressDto(Long id) {
+        this.id = id;
     }
 
     public UserAddressEntity toUserAddress() {

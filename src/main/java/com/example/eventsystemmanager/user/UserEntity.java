@@ -43,4 +43,8 @@ public class UserEntity {
     private String phone;
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
+    public Long getUserAddressEntityId() {
+        return userAddressEntity.getId();
+    }
 }

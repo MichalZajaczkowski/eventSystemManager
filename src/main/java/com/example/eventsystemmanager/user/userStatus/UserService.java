@@ -152,14 +152,14 @@ public class UserService {
         UserStatus userStatus = UserStatus.fromName(statusName);
         List<UserEntity> users = userRepository.findByUserStatus(userStatus);
         return users.stream()
-                .map(userMapper::userMapToDto)
+                .map(this::mapUserToDtoSimple)
                 .collect(Collectors.toList());
     }
     public List<UserDto> getUsersByStatusValue(Integer statusValue) {
         UserStatus userStatus = UserStatus.fromValue(statusValue);
         List<UserEntity> users = userRepository.findByUserStatus(userStatus);
         return users.stream()
-                .map(userMapper::userMapToDto)
+                .map(this::mapUserToDtoSimple)
                 .collect(Collectors.toList());
     }
 
@@ -174,6 +174,14 @@ public class UserService {
         userDto.setEmail(userEntity.getEmail());
         userDto.setPhone(userEntity.getPhone());
         userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
+        userDto.setUserStatus(userEntity.getUserStatus());
+        return userDto;
+    }
+
+    private UserDto mapUserToDtoSimple(UserEntity userEntity) {
+        UserDto userDto = new UserDto();
+        userDto.setId(userEntity.getId());
+        userDto.setUserAddressToDto(userEntity.getUserAddressEntityId());
         userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
