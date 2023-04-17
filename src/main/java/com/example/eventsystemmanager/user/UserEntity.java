@@ -21,7 +21,7 @@ public class UserEntity {
     @Column(unique = true, name = "id")
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_address_id")
     private UserAddressEntity userAddressEntity;
 

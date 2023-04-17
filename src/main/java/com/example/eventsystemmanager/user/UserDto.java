@@ -54,7 +54,7 @@ public class UserDto {
         this.userAddress = new UserAddressDto(userAddressEntity);
     }
 
-    public void setUserAddressToDto(Long userAddressEntityId) {
+    public void setUserAddressToDtoId(Long userAddressEntityId) {
         this.userAddress = new UserAddressDto(userAddressEntityId);
     }
 }

@@ -181,7 +181,7 @@ public class UserService {
     private UserDto mapUserToDtoSimple(UserEntity userEntity) {
         UserDto userDto = new UserDto();
         userDto.setId(userEntity.getId());
-        userDto.setUserAddressToDto(userEntity.getUserAddressEntityId());
+        userDto.setUserAddressToDtoId(userEntity.getUserAddressEntityId());
         userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
