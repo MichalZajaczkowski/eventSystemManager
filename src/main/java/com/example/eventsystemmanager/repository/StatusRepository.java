@@ -1,15 +1,15 @@
 package com.example.eventsystemmanager.repository;
 
-import com.example.eventsystemmanager.entity.StatusEntity;
+import com.example.eventsystemmanager.entity.UserStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface StatusRepository extends JpaRepository<StatusEntity, Long> {
+public interface StatusRepository extends JpaRepository<UserStatusEntity, Long> {
 
-    Optional<StatusEntity> findByName(String name);
+    Optional<UserStatusEntity> findByName(String name);
 
-    StatusEntity findByValue(Integer value);
+    UserStatusEntity findByValue(Integer value);
 }

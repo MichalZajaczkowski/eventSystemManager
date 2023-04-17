@@ -1,6 +1,6 @@
 package com.example.eventsystemmanager.enums;
 
-public enum StatusType {
+public enum UserStatus {
     AKTYWNY("AKTYWNY", 0),
     NIEAKTYWNY("NIEAKTYWNY", 1),
     DO_AKTYWACJI("DO AKTYWACJI", 2),
@@ -9,7 +9,7 @@ public enum StatusType {
     private final String name;
     private final Integer value;
 
-    StatusType(String name, Integer value) {
+    UserStatus(String name, Integer value) {
         this.name = name;
         this.value = value;
     }
@@ -22,8 +22,8 @@ public enum StatusType {
         return value;
     }
 
-    public static StatusType fromValue(Integer value) {
-        for (StatusType status : StatusType.values()) {
+    public static UserStatus fromValue(Integer value) {
+        for (UserStatus status : UserStatus.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }
@@ -31,10 +31,10 @@ public enum StatusType {
         throw new IllegalArgumentException("Nieprawidłowa wartość statusu: " + value);
     }
 
-    public static StatusType fromName(String name) {
-        for (StatusType status : StatusType.values()) {
+    public static UserStatus fromName(String name) {
+        for (UserStatus status : UserStatus.values()) {
             if (status.getName().equals(name)) {
-                return status;
+                return status; 
             }
         }
         throw new IllegalArgumentException("Nieprawidłowa nazwa statusu: " + name);

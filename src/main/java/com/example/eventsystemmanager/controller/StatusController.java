@@ -1,7 +1,7 @@
 package com.example.eventsystemmanager.controller;
 
-import com.example.eventsystemmanager.dto.StatusDto;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.dto.UserStatusDto;
+import com.example.eventsystemmanager.enums.UserStatus;
 import com.example.eventsystemmanager.service.StatusService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +22,16 @@ public class StatusController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StatusDto>> getAllStatuses() {
-        List<StatusDto> statusDtos = statusService.getAllStatuses();
-        return ResponseEntity.ok(statusDtos);
+    public ResponseEntity<List<UserStatusDto>> getAllStatuses() {
+        List<UserStatusDto> userStatusDtos = statusService.getAllStatuses();
+        return ResponseEntity.ok(userStatusDtos);
     }
 
     @GetMapping("/{value}")
     public ResponseEntity<Integer> getStatusValue(@PathVariable Integer value) {
         try {
-            StatusType statusType = StatusType.fromValue(value);
-            return ResponseEntity.ok(statusType.getValue());
+            UserStatus userStatus = UserStatus.fromValue(value);
+            return ResponseEntity.ok(userStatus.getValue());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
@@ -40,8 +40,8 @@ public class StatusController {
     @GetMapping("/name")
     public ResponseEntity<String> getStatusName(@PathVariable String name) {
         try {
-            StatusType statusType = StatusType.fromName(name);
-            return ResponseEntity.ok(statusType.getName());
+            UserStatus userStatus = UserStatus.fromName(name);
+            return ResponseEntity.ok(userStatus.getName());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

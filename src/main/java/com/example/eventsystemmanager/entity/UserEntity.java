@@ -1,6 +1,6 @@
 package com.example.eventsystemmanager.entity;
 
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.enums.UserStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,5 +41,5 @@ public class UserEntity {
     @Column(name = "phone")
     private String phone;
     @Enumerated(EnumType.STRING)
-    private StatusType status;
+    private UserStatus userStatus;
 }

@@ -3,7 +3,7 @@ package com.example.eventsystemmanager.service;
 import com.example.eventsystemmanager.dto.UserDto;
 import com.example.eventsystemmanager.entity.UserAddressEntity;
 import com.example.eventsystemmanager.entity.UserEntity;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.enums.UserStatus;
 import com.example.eventsystemmanager.mapper.UserMapper;
 import com.example.eventsystemmanager.repository.StatusRepository;
 import com.example.eventsystemmanager.repository.UserAddressRepository;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -145,21 +144,21 @@ public class UserService {
         userRepository.delete(userEntity);
     }
 
-    public void setStatus(UserDto userDto, StatusType statusType) {
+    public void setStatus(UserDto userDto, UserStatus userStatus) {
         UserEntity user = userRepository.findById(userDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found."));
-        user.setStatus(statusType);
+        user.setUserStatus(userStatus);
         userRepository.save(user);
     }
     public List<UserDto> getUsersByStatusName(String statusName) {
-        StatusType statusType = StatusType.fromName(statusName);
-        List<UserEntity> users = userRepository.findByStatus_StatusType(statusType);
+        UserStatus userStatus = UserStatus.fromName(statusName);
+        List<UserEntity> users = userRepository.findByUserStatus(userStatus);
         return users.stream()
                 .map(userMapper::userMapToDto)
                 .collect(Collectors.toList());
     }
     public List<UserDto> getUsersByStatusValue(Integer statusValue) {
-        StatusType statusType = StatusType.fromValue(statusValue);
-        List<UserEntity> users = userRepository.findByStatus_StatusType(statusType);
+        UserStatus userStatus = UserStatus.fromValue(statusValue);
+        List<UserEntity> users = userRepository.findByUserStatus(userStatus);
         return users.stream()
                 .map(userMapper::userMapToDto)
                 .collect(Collectors.toList());
@@ -176,7 +175,7 @@ public class UserService {
         userDto.setEmail(userEntity.getEmail());
         userDto.setPhone(userEntity.getPhone());
         userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
-        userDto.setStatus(userEntity.getStatus());
+        userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
 }

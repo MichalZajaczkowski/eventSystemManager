@@ -1,7 +1,7 @@
 package com.example.eventsystemmanager.repository;
 
 import com.example.eventsystemmanager.entity.UserEntity;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.enums.UserStatus;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,8 +19,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     List<UserEntity> findAll();
 
     Optional<UserEntity> findById(Long id);
-    @Query("SELECT u FROM UserEntity u WHERE u.status = :statusType")
-    List<UserEntity> findByStatus_StatusType(@Param("statusType") StatusType statusType);
+    @Query("SELECT u FROM UserEntity u WHERE u.userStatus = :userStatus")
+    List<UserEntity> findByUserStatus(@Param("userStatus") UserStatus userStatus);
 
     UserEntity save(UserEntity userEntity);
 

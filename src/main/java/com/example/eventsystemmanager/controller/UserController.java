@@ -1,8 +1,8 @@
 package com.example.eventsystemmanager.controller;
 
-import com.example.eventsystemmanager.dto.StatusDto;
+import com.example.eventsystemmanager.dto.UserStatusDto;
 import com.example.eventsystemmanager.dto.UserDto;
-import com.example.eventsystemmanager.enums.StatusType;
+import com.example.eventsystemmanager.enums.UserStatus;
 import com.example.eventsystemmanager.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,13 +93,13 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PutMapping("/{id}/status")
-    public ResponseEntity<UserDto> changeUserStatus(@PathVariable Long id, @RequestBody StatusDto statusDto) {
+    public ResponseEntity<UserDto> changeUserStatus(@PathVariable Long id, @RequestBody UserStatusDto userStatusDto) {
         UserDto user = userService.findById(id);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        StatusType statusType = StatusType.valueOf(String.valueOf(statusDto.getStatusType()));
-        userService.setStatus(user, statusType);
+        UserStatus userStatus = UserStatus.valueOf(String.valueOf(userStatusDto.getUserStatus()));
+        userService.setStatus(user, userStatus);
         log.info("User status changed successfully.");
         return ResponseEntity.ok(user);
     }
