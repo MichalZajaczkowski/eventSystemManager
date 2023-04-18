@@ -113,16 +113,17 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym id: " + userId));
 
         UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
-
         // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
-        UserAddressEntity existingAddress = userAddressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
-        if (existingAddress != null) {
-            newAddress = existingAddress;
-        } else {
-            newAddress = userAddressRepository.save(newAddress);
-        }
-
+        newAddress = checkIfAnotherUserIsAlreadyAssignedTheSameAddress(newAddress);
         // Jeśli id adresu nie zostało podane, to zapisz nowy adres
+        newAddress = ifTheAddressIdIsNotGivenSaveTheNewAddress(userAddressDto, newAddress);
+        // Aktualizuj adres tylko dla aktualizowanego użytkownika
+        user.setUserAddressEntity(newAddress);
+        userRepository.save(user);
+        return newAddress;
+    }
+
+    private UserAddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(UserAddressDto userAddressDto, UserAddressEntity newAddress) {
         if (newAddress.getId() == null) {
             newAddress = userAddressRepository.save(newAddress);
         } else { // W przeciwnym wypadku, zaktualizuj istniejący adres
@@ -134,10 +135,16 @@ public class UserService {
             }
             newAddress.updateFieldsFromDto(userAddressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
         }
+        return newAddress;
+    }
 
-        // Aktualizuj adres tylko dla aktualizowanego użytkownika
-        user.setUserAddressEntity(newAddress);
-        userRepository.save(user);
+    private UserAddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(UserAddressEntity newAddress) {
+        UserAddressEntity existingAddress = userAddressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
+        if (existingAddress != null) {
+            newAddress = existingAddress;
+        } else {
+            newAddress = userAddressRepository.save(newAddress);
+        }
         return newAddress;
     }
 
