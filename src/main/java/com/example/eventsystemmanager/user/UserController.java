@@ -1,6 +1,8 @@
 package com.example.eventsystemmanager.user;
 
-import com.example.eventsystemmanager.user.userStatus.UserService;
+import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
+import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.user.userAddress.UserAddressMapper;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import com.example.eventsystemmanager.user.userStatus.UserStatusDto;
 import io.swagger.annotations.ApiOperation;
@@ -24,6 +26,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserAddressMapper userAddressMapper;
 
     @Operation(summary = "Gets all user", description = "Gets list of all users")
     @ApiResponses(value = {
@@ -61,6 +64,17 @@ public class UserController {
         log.info("Log: User was created");
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
         //return ResponseEntity.created(URI.create("/api/v1/users/" + savedUserDto.getId())).body(savedUserDto);
+    }
+
+    @PutMapping("/{userId}/address")
+    public ResponseEntity<UserAddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody UserAddressDto userAddressDto) {
+        UserAddressEntity updatedAddress = userService.updateAddressForUser(userId, userAddressDto);
+        return new ResponseEntity<>(userAddressMapper.userAddressMapToDto(updatedAddress), HttpStatus.OK);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 

@@ -1,20 +1,19 @@
-package com.example.eventsystemmanager.user.userStatus;
+package com.example.eventsystemmanager.user;
 
 import com.example.eventsystemmanager.status.StatusRepository;
-import com.example.eventsystemmanager.user.UserDto;
-import com.example.eventsystemmanager.user.UserEntity;
-import com.example.eventsystemmanager.user.UserMapper;
-import com.example.eventsystemmanager.user.UserRepository;
+import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
 import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.user.userAddress.UserAddressMapper;
 import com.example.eventsystemmanager.user.userAddress.UserAddressRepository;
+import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.NamingConventions;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -29,6 +28,8 @@ public class UserService {
 
     private final StatusRepository statusRepository;
     private final UserMapper userMapper;
+
+    private final UserAddressMapper userAddressMapper;
     private final ModelMapper modelMapper;
     @PostConstruct
     public void configureMapper() {
@@ -104,37 +105,40 @@ public class UserService {
         if (userDto.getPhone() != null) {
             userEntity.setPhone(userDto.getPhone());
         }
-        userAddressUpdate(userDto, userEntity);
         userRepository.save(userEntity);
     }
 
-    @CheckForNull
-    private void userAddressUpdate(UserDto userDto, UserEntity userEntity) {
-        if (userDto.getUserAddress() != null) {
-            UserAddressEntity userAddressEntity = userAddressRepository.findById(userDto.getUserAddress().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist"));
-            if (userAddressEntity != null) {
-                userEntity.setUserAddressEntity(userAddressEntity);
-            }
-            if (userDto.getUserAddress().getCountry() != null) {
-                userAddressEntity.setCountry(userDto.getUserAddress().getCountry());
-            }
-            if (userDto.getUserAddress().getCity() != null) {
-                userAddressEntity.setCity(userDto.getUserAddress().getCity());
-            }
-            if (userDto.getUserAddress().getStreet() != null) {
-                userAddressEntity.setStreet(userDto.getUserAddress().getStreet());
-            }
-            if (userDto.getUserAddress().getBuildingNumber() != null) {
-                userAddressEntity.setBuildingNumber(userDto.getUserAddress().getBuildingNumber());
-            }
-            if (userDto.getUserAddress().getLocalNumber() != null) {
-                userAddressEntity.setLocalNumber(userDto.getUserAddress().getLocalNumber());
-            }
-            if (userDto.getUserAddress().getPostCode() != null) {
-                userAddressEntity.setPostCode(userDto.getUserAddress().getPostCode());
-            }
+    public UserAddressEntity updateAddressForUser(Long userId, UserAddressDto userAddressDto) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym id: " + userId));
+
+        UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
+
+        // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
+        UserAddressEntity existingAddress = userAddressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
+        if (existingAddress != null) {
+            newAddress = existingAddress;
+        } else {
+            newAddress = userAddressRepository.save(newAddress);
         }
+
+        // Jeśli id adresu nie zostało podane, to zapisz nowy adres
+        if (newAddress.getId() == null) {
+            newAddress = userAddressRepository.save(newAddress);
+        } else { // W przeciwnym wypadku, zaktualizuj istniejący adres
+            Optional<UserAddressEntity> existingAddressId = userAddressRepository.findById(newAddress.getId());
+            if (existingAddressId.isPresent()) {
+                newAddress = existingAddressId.get();
+            } else {
+                throw new IllegalArgumentException("Nie znaleziono adresu o podanym id: " + newAddress.getId());
+            }
+            newAddress.updateFieldsFromDto(userAddressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
+        }
+
+        // Aktualizuj adres tylko dla aktualizowanego użytkownika
+        user.setUserAddressEntity(newAddress);
+        userRepository.save(user);
+        return newAddress;
     }
 
     public void removeUser(Long id) {
@@ -176,6 +180,18 @@ public class UserService {
         userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
         userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
+    }
+
+    private UserAddressEntity mapToUserAddressEntity(UserAddressDto addressDto) {
+        return UserAddressEntity.builder()
+                .id(addressDto.getId())
+                .country(addressDto.getCountry())
+                .city(addressDto.getCity())
+                .street(addressDto.getStreet())
+                .buildingNumber(addressDto.getBuildingNumber())
+                .localNumber(addressDto.getLocalNumber())
+                .postCode(addressDto.getPostCode())
+                .build();
     }
 
     private UserDto mapUserToDtoSimple(UserEntity userEntity) {

@@ -1,6 +1,8 @@
 package com.example.eventsystemmanager.user.userAddress;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -14,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class UserAddressDto {
 
     @NotBlank
+    @JsonIgnore
     private Long id;
     @NotBlank
     private String country;
