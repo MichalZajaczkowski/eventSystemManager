@@ -6,4 +6,5 @@ import org.mapstruct.Mapper;
 public interface UserAddressMapper {
 
     UserAddressDto userAddressMapToDto(UserAddressEntity userAddressEntity);
+    UserAddressEntity userAddressMapToEntity(UserAddressDto userAddressDto);
 }

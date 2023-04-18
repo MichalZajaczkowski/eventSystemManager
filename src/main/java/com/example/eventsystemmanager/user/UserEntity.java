@@ -21,7 +21,7 @@ public class UserEntity {
     @Column(unique = true, name = "id")
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_address_id")
     private UserAddressEntity userAddressEntity;
 
@@ -43,4 +43,8 @@ public class UserEntity {
     private String phone;
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
+    public Long getUserAddressEntityId() {
+        return userAddressEntity.getId();
+    }
 }
