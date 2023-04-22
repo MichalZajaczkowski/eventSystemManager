@@ -43,14 +43,30 @@ public class UserController {
             return ResponseEntity.ok(user);
         }
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto user = userService.findById(id);
         log.info("User found: " + userService.findById(id));
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
-
+    @GetMapping("/status/name/{statusName}")
+    public ResponseEntity<List<UserDto>> getUsersByStatusName(@PathVariable String statusName) {
+        List<UserDto> user = userService.getUsersByStatusName(statusName);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return new ResponseEntity<>( user, HttpStatus.OK);
+        }
+    }
+    @GetMapping("/status/value/{statusValue}")
+    public ResponseEntity<List<UserDto>> getUsersByStatusValue(@PathVariable Integer statusValue) {
+        List<UserDto> user = userService.getUsersByStatusValue(statusValue);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return new ResponseEntity<>( user, HttpStatus.OK);
+        }
+    }
     @Operation(summary = "Gets user by id", description = "Get user based on it's id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful response",
@@ -65,40 +81,26 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
         //return ResponseEntity.created(URI.create("/api/v1/users/" + savedUserDto.getId())).body(savedUserDto);
     }
-
-    @PutMapping("/{userId}/address")
-    public ResponseEntity<UserAddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody UserAddressDto userAddressDto) {
-        UserAddressEntity updatedAddress = userService.updateAddressForUser(userId, userAddressDto);
-        return new ResponseEntity<>(userAddressMapper.userAddressMapToDto(updatedAddress), HttpStatus.OK);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-
-
     @PatchMapping()
     public ResponseEntity<UserDto> partialUpdateUser(@RequestBody UserDto userDto) {
         userService.partialUpdateUser(userDto);
         log.info("Log: User was updated");
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
+    @PutMapping("/{userId}/address")
+    public ResponseEntity<UserAddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody UserAddressDto userAddressDto) {
+        UserAddressEntity updatedAddress = userService.updateAddressForUser(userId, userAddressDto);
+        return new ResponseEntity<>(userAddressMapper.userAddressMapToDto(updatedAddress), HttpStatus.OK);
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
     @PutMapping()
     public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
         userService.updateUser(userDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Long id) {
-        userService.removeUser(id);
-        log.info("log: User removed successfully.");
-        return ResponseEntity.noContent().build();
-    }
-
     @ApiOperation(value = "Changes user status", notes = "Changes status of user with specified ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User status changed successfully"),
@@ -117,26 +119,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/status/name/{statusName}")
-    public ResponseEntity<List<UserDto>> getUsersByStatusName(@PathVariable String statusName) {
-        List<UserDto> user = userService.getUsersByStatusName(statusName);
-        if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return new ResponseEntity<>( user, HttpStatus.OK);
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        userService.removeUser(id);
+        log.info("log: User removed successfully.");
+        return ResponseEntity.noContent().build();
     }
-
-
-    @GetMapping("/status/value/{statusValue}")
-    public ResponseEntity<List<UserDto>> getUsersByStatusValue(@PathVariable Integer statusValue) {
-        List<UserDto> user = userService.getUsersByStatusValue(statusValue);
-        if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return new ResponseEntity<>( user, HttpStatus.OK);
-        }
-    }
-
-
 }

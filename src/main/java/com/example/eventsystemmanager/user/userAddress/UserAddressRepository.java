@@ -19,6 +19,9 @@ public interface UserAddressRepository extends JpaRepository<UserAddressEntity,L
     @Query("SELECT ua FROM UserAddressEntity ua WHERE ua.country = :country AND ua.city = :city AND ua.street = :street AND ua.buildingNumber = :buildingNumber AND ua.localNumber = :localNumber AND ua.postCode = :postCode")
     UserAddressEntity findByAddressFields(@Param("country") String country, @Param("city") String city, @Param("street") String street, @Param("buildingNumber") Integer buildingNumber, @Param("localNumber") Integer localNumber, @Param("postCode") Integer postCode);
 
+    @Query("SELECT ua FROM UserAddressEntity ua WHERE ua.id = :id OR (ua.country = :country AND ua.city = :city AND ua.street = :street AND ua.buildingNumber = :buildingNumber AND ua.localNumber = :localNumber AND ua.postCode = :postCode)")
+    UserAddressEntity findByIdOrFindByAddressFields(@Param("id") Long id, @Param("country") String country, @Param("city") String city, @Param("street") String street, @Param("buildingNumber") Integer buildingNumber, @Param("localNumber") Integer localNumber, @Param("postCode") Integer postCode);
+
 
     Optional<UserAddressEntity> findById(Long id);
 
