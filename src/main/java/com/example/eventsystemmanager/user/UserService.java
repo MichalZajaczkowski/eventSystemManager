@@ -31,6 +31,7 @@ public class UserService {
 
     private final UserAddressMapper userAddressMapper;
     private final ModelMapper modelMapper;
+
     @PostConstruct
     public void configureMapper() {
         modelMapper.getConfiguration()
@@ -54,24 +55,31 @@ public class UserService {
     }
 
     public UserDto createUser(UserDto userDto) {
-        if (userDto.getUserAddress() != null && userDto.getUserAddress().getId() != null) {
-            if (userAddressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
-                throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
+        UserEntity userEntity = userDto.toUser();
+
+        if (userDto.getUserAddress() != null) {
+            UserAddressDto userAddressDto = userDto.getUserAddress();
+
+            // Check if an address with the same fields already exists in the database
+            UserAddressEntity existingAddress = userAddressRepository.findByIdOrFindByAddressFields(userAddressDto.getId(),
+                    userAddressDto.getCountry(), userAddressDto.getCity(), userAddressDto.getStreet(), userAddressDto.getBuildingNumber(),
+                    userAddressDto.getLocalNumber(), userAddressDto.getPostCode());
+
+            if (existingAddress != null) {
+                // Set the existing user address id for the user
+                userEntity.setUserAddressEntity(existingAddress);
+            } else {
+                // Create a new user address with a new id
+                UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
+                newAddress = userAddressRepository.save(newAddress);
+                userEntity.setUserAddressEntity(newAddress);
             }
-            Long id = userDto.getUserAddress().getId();
-            userAddressRepository.findById(id)
-                    .ifPresent(userAddress -> {
-                                userDto.setUserAddressToDto(userAddress);
-                                userRepository.save(userDto.toUser());
-                            }
-                    );
-        } else {
-            UserEntity userEntity = userDto.toUser();
-            userAddressRepository.save(userEntity.getUserAddressEntity());
-            userRepository.save(userEntity);
         }
+
+        userRepository.save(userEntity);
         return userDto;
     }
+
 
     public void updateUser(UserDto userDto) {
         if (userRepository.findById(userDto.getId()).isEmpty()) {
@@ -159,6 +167,7 @@ public class UserService {
         user.setUserStatus(userStatus);
         userRepository.save(user);
     }
+
     public List<UserDto> getUsersByStatusName(String statusName) {
         UserStatus userStatus = UserStatus.fromName(statusName);
         List<UserEntity> users = userRepository.findByUserStatus(userStatus);
@@ -166,6 +175,7 @@ public class UserService {
                 .map(this::mapUserToDtoSimple)
                 .collect(Collectors.toList());
     }
+
     public List<UserDto> getUsersByStatusValue(Integer statusValue) {
         UserStatus userStatus = UserStatus.fromValue(statusValue);
         List<UserEntity> users = userRepository.findByUserStatus(userStatus);
@@ -204,7 +214,7 @@ public class UserService {
     private UserDto mapUserToDtoSimple(UserEntity userEntity) {
         UserDto userDto = new UserDto();
         userDto.setId(userEntity.getId());
-        userDto.setUserAddressToDtoId(userEntity.getUserAddressEntityId());
+//        userDto.setUserAddressToDtoId(userEntity.getUserAddressEntityId());
         userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
