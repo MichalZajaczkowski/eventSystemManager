@@ -1,8 +1,8 @@
 package com.example.eventsystemmanager.user;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
-import com.example.eventsystemmanager.user.userAddress.UserAddressMapper;
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import com.example.eventsystemmanager.user.userStatus.UserStatusDto;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +26,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserAddressMapper userAddressMapper;
+    private final AddressMapper addressMapper;
 
     @Operation(summary = "Gets all user", description = "Gets list of all users")
     @ApiResponses(value = {
@@ -88,9 +88,9 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     @PutMapping("/{userId}/address")
-    public ResponseEntity<UserAddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody UserAddressDto userAddressDto) {
-        UserAddressEntity updatedAddress = userService.updateAddressForUser(userId, userAddressDto);
-        return new ResponseEntity<>(userAddressMapper.userAddressMapToDto(updatedAddress), HttpStatus.OK);
+    public ResponseEntity<AddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody AddressDto addressDto) {
+        AddressEntity updatedAddress = userService.updateAddressForUser(userId, addressDto);
+        return new ResponseEntity<>(addressMapper.addressMapToDto(updatedAddress), HttpStatus.OK);
     }
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {

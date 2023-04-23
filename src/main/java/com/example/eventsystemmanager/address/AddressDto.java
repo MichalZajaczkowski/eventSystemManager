@@ -1,8 +1,7 @@
-package com.example.eventsystemmanager.user.userAddress;
+package com.example.eventsystemmanager.address;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -13,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserAddressDto {
+public class AddressDto {
 
     @NotBlank
     @JsonIgnore
@@ -31,22 +30,22 @@ public class UserAddressDto {
     @NotBlank
     private Integer postCode;
 
-    public UserAddressDto(UserAddressEntity userAddressEntity) {
-        this.id = userAddressEntity.getId();
-        this.country = userAddressEntity.getCountry();
-        this.city = userAddressEntity.getCity();
-        this.street = userAddressEntity.getStreet();
-        this.buildingNumber = userAddressEntity.getBuildingNumber();
-        this.localNumber = userAddressEntity.getLocalNumber();
-        this.postCode = userAddressEntity.getPostCode();
+    public AddressDto(AddressEntity addressEntity) {
+        this.id = addressEntity.getId();
+        this.country = addressEntity.getCountry();
+        this.city = addressEntity.getCity();
+        this.street = addressEntity.getStreet();
+        this.buildingNumber = addressEntity.getBuildingNumber();
+        this.localNumber = addressEntity.getLocalNumber();
+        this.postCode = addressEntity.getPostCode();
     }
 
-    public UserAddressDto(Long id) {
+    public AddressDto(Long id) {
         this.id = id;
     }
 
-    public UserAddressEntity toUserAddress() {
-        return new UserAddressEntity(
+    public AddressEntity toUserAddress() {
+        return new AddressEntity(
                 id,
                 country,
                 city,

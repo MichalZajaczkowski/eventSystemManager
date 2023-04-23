@@ -1,6 +1,6 @@
 package com.example.eventsystemmanager.user;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import lombok.*;
 
@@ -22,8 +22,8 @@ public class UserEntity {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_address_id")
-    private UserAddressEntity userAddressEntity;
+    @JoinColumn(name = "address_id")
+    private AddressEntity addressEntity;
 
     @Column(name = "user_name")
     private String userName;
@@ -45,6 +45,6 @@ public class UserEntity {
     private UserStatus userStatus;
 
     public Long getUserAddressEntityId() {
-        return userAddressEntity.getId();
+        return addressEntity.getId();
     }
 }
