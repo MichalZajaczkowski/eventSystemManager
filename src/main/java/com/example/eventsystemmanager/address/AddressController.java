@@ -1,4 +1,4 @@
-package com.example.eventsystemmanager.user.userAddress;
+package com.example.eventsystemmanager.address;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,17 +18,17 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/userAddress")
-public class UsersAddressController {
-    private final UserAddressRepository userAddressRepository;
-    private final UserAddressService userAddressService;
+public class AddressController {
+    private final AddressRepository addressRepository;
+    private final AddressService addressService;
 
     @GetMapping()
-    public ResponseEntity<List<UserAddressDto>> getUsersAddress() {
-        List<UserAddressDto> usersAddressDtoList = userAddressService.findAll();
+    public ResponseEntity<List<AddressDto>> getUsersAddress() {
+        List<AddressDto> usersAddressDtoList = addressService.findAll();
         if (usersAddressDtoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            log.info("UsersAddress returned: " + userAddressService.findAll());
+            log.info("UsersAddress returned: " + addressService.findAll());
             return ResponseEntity.ok(usersAddressDtoList);
         }
     }
@@ -36,14 +36,14 @@ public class UsersAddressController {
     @Operation(summary = "Gets userAddress by id", description = "Get userAddress based on it's id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful response",
-                    content = @Content(schema = @Schema(implementation = UserAddressDto.class))),
+                    content = @Content(schema = @Schema(implementation = AddressDto.class))),
             @ApiResponse(responseCode = "404", description = "userAddress cannot be found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserAddressDto> getUsersAddressById(@Parameter(description = "userAddress to be saved") @PathVariable Long id) {
-        UserAddressDto userAddressDto = userAddressService.findById(id);
-        log.info("User address found: " + userAddressService.findById(id));
-        return userAddressDto != null ? new ResponseEntity<>(HttpStatus.OK) : ResponseEntity.notFound().build();
+    public ResponseEntity<AddressDto> getUsersAddressById(@Parameter(description = "userAddress to be saved") @PathVariable Long id) {
+        AddressDto addressDto = addressService.findById(id);
+        log.info("User address found: " + addressService.findById(id));
+        return addressDto != null ? new ResponseEntity<>(HttpStatus.OK) : ResponseEntity.notFound().build();
     }
 //    @GetMapping("/{id}")
 //    public ResponseEntity getPublisher(@PathVariable Long id) {
@@ -54,29 +54,29 @@ public class UsersAddressController {
 //    }
 
     @PostMapping()
-    public ResponseEntity<UserAddressDto> save(@RequestBody UserAddressDto userAddressDto) {
-        userAddressService.createUserAddress(userAddressDto);
+    public ResponseEntity<AddressDto> save(@RequestBody AddressDto addressDto) {
+        addressService.createUserAddress(addressDto);
         log.info("User address was created");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<UserAddressDto> update(@RequestBody UserAddressDto userAddressDto) {
-        userAddressService.updateUserAddress(userAddressDto);
+    public ResponseEntity<AddressDto> update(@RequestBody AddressDto addressDto) {
+        addressService.updateUserAddress(addressDto);
         log.info("User address was updated");
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @PatchMapping
-    public ResponseEntity<UserAddressDto> partialUpdateUserAddress(@RequestBody UserAddressDto userAddressDto) {
-        userAddressService.partialUpdateUserAddress(userAddressDto);
+    public ResponseEntity<AddressDto> partialUpdateUserAddress(@RequestBody AddressDto addressDto) {
+        addressService.partialUpdateUserAddress(addressDto);
         log.info("User address was updated");
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deleteAddress(@PathVariable Long id) {
-        userAddressService.removeAddress(id);
+        addressService.removeAddress(id);
         log.info("log:Address removed successfully.");
         return ResponseEntity.noContent().build();
 

@@ -1,10 +1,10 @@
 package com.example.eventsystemmanager.user;
 
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.status.StatusRepository;
-import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
-import com.example.eventsystemmanager.user.userAddress.UserAddressMapper;
-import com.example.eventsystemmanager.user.userAddress.UserAddressRepository;
+import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,13 +23,13 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 public class UserService {
 
     private static final String USERADDRESSWITHIDSTATEMENT = "UserAddress with id " + id + " does not exist.";
-    private final UserAddressRepository userAddressRepository;
+    private final AddressRepository addressRepository;
     private final UserRepository userRepository;
 
     private final StatusRepository statusRepository;
     private final UserMapper userMapper;
 
-    private final UserAddressMapper userAddressMapper;
+    private final AddressMapper addressMapper;
     private final ModelMapper modelMapper;
 
     @PostConstruct
@@ -58,21 +58,21 @@ public class UserService {
         UserEntity userEntity = userDto.toUserEntity();
 
         if (userDto.getUserAddress() != null) {
-            UserAddressDto userAddressDto = userDto.getUserAddress();
+            AddressDto addressDto = userDto.getUserAddress();
 
             // Check if an address with the same fields already exists in the database
-            UserAddressEntity existingAddress = userAddressRepository.findByIdOrFindByAddressFields(userAddressDto.getId(),
-                    userAddressDto.getCountry(), userAddressDto.getCity(), userAddressDto.getStreet(), userAddressDto.getBuildingNumber(),
-                    userAddressDto.getLocalNumber(), userAddressDto.getPostCode());
+            AddressEntity existingAddress = addressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
+                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
+                    addressDto.getLocalNumber(), addressDto.getPostCode());
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
-                userEntity.setUserAddressEntity(existingAddress);
+                userEntity.setAddressEntity(existingAddress);
             } else {
                 // Create a new user address with a new id
-                UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
-                newAddress = userAddressRepository.save(newAddress);
-                userEntity.setUserAddressEntity(newAddress);
+                AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
+                newAddress = addressRepository.save(newAddress);
+                userEntity.setAddressEntity(newAddress);
             }
         }
 
@@ -84,10 +84,10 @@ public class UserService {
     public void updateUser(UserDto userDto) {
         if (userRepository.findById(userDto.getId()).isEmpty()) {
             throw new IllegalArgumentException(USERADDRESSWITHIDSTATEMENT);
-        } else if (userAddressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
+        } else if (addressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
             throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
         } else {
-            userAddressRepository.save(userDto.getUserAddress().toUserAddress());
+            addressRepository.save(userDto.getUserAddress().toUserAddress());
         }
         userRepository.save(userDto.toUserEntity());
     }
@@ -116,42 +116,42 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public UserAddressEntity updateAddressForUser(Long userId, UserAddressDto userAddressDto) {
+    public AddressEntity updateAddressForUser(Long userId, AddressDto addressDto) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o podanym id: " + userId));
 
-        UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
+        AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
         // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
         newAddress = checkIfAnotherUserIsAlreadyAssignedTheSameAddress(newAddress);
         // Jeśli id adresu nie zostało podane, to zapisz nowy adres
-        newAddress = ifTheAddressIdIsNotGivenSaveTheNewAddress(userAddressDto, newAddress);
+        newAddress = ifTheAddressIdIsNotGivenSaveTheNewAddress(addressDto, newAddress);
         // Aktualizuj adres tylko dla aktualizowanego użytkownika
-        user.setUserAddressEntity(newAddress);
+        user.setAddressEntity(newAddress);
         userRepository.save(user);
         return newAddress;
     }
 
-    private UserAddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(UserAddressDto userAddressDto, UserAddressEntity newAddress) {
+    private AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
         if (newAddress.getId() == null) {
-            newAddress = userAddressRepository.save(newAddress);
+            newAddress = addressRepository.save(newAddress);
         } else { // W przeciwnym wypadku, zaktualizuj istniejący adres
-            Optional<UserAddressEntity> existingAddressId = userAddressRepository.findById(newAddress.getId());
+            Optional<AddressEntity> existingAddressId = addressRepository.findById(newAddress.getId());
             if (existingAddressId.isPresent()) {
                 newAddress = existingAddressId.get();
             } else {
                 throw new IllegalArgumentException("Nie znaleziono adresu o podanym id: " + newAddress.getId());
             }
-            newAddress.updateFieldsFromDto(userAddressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
+            newAddress.updateFieldsFromDto(addressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
         }
         return newAddress;
     }
 
-    private UserAddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(UserAddressEntity newAddress) {
-        UserAddressEntity existingAddress = userAddressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
+    private AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
+        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
         if (existingAddress != null) {
             newAddress = existingAddress;
         } else {
-            newAddress = userAddressRepository.save(newAddress);
+            newAddress = addressRepository.save(newAddress);
         }
         return newAddress;
     }
@@ -194,13 +194,13 @@ public class UserService {
         userDto.setPassword(userEntity.getPassword());
         userDto.setEmail(userEntity.getEmail());
         userDto.setPhone(userEntity.getPhone());
-        userDto.setUserAddressToDto(userEntity.getUserAddressEntity());
+        userDto.setUserAddressToDto(userEntity.getAddressEntity());
         userDto.setUserStatus(userEntity.getUserStatus());
         return userDto;
     }
 
-    private UserAddressEntity mapToUserAddressEntity(UserAddressDto addressDto) {
-        return UserAddressEntity.builder()
+    private AddressEntity mapToUserAddressEntity(AddressDto addressDto) {
+        return AddressEntity.builder()
                 .id(addressDto.getId())
                 .country(addressDto.getCountry())
                 .city(addressDto.getCity())

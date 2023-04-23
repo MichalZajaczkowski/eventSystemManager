@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.user;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import lombok.*;
 
@@ -22,8 +23,8 @@ public class UserEntity {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_address_id")
-    private UserAddressEntity userAddressEntity;
+    @JoinColumn(name = "address_id")
+    private AddressEntity addressEntity;
 
     @Column(name = "user_name")
     private String userName;
@@ -44,7 +45,10 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+    @Enumerated(EnumType.STRING)
+    private AddressType addressType;
+
     public Long getUserAddressEntityId() {
-        return userAddressEntity.getId();
+        return addressEntity.getId();
     }
 }
