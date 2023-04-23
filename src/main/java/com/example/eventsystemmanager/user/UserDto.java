@@ -37,7 +37,7 @@ public class UserDto {
     private UserStatus userStatus;
 
 
-    public UserEntity toUser() {
+    public UserEntity toUserEntity() {
         return new UserEntity(
                 id,
                 userAddress.toUserAddress(),
