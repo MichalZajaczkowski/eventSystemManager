@@ -18,18 +18,15 @@ import javax.validation.constraints.NotNull;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlaceDto {
 
+    @NotBlank
     private Long id;
-
     @NotNull
     @Valid
     private UserAddressDto userAddressDto;
-
     @NotBlank
     private String name;
-
     @NotBlank
     private String shortName;
-
     @NotBlank
     private String description;
 }
