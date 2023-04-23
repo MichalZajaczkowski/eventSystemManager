@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.user;
 
 import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import lombok.*;
 
@@ -43,6 +44,9 @@ public class UserEntity {
     private String phone;
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
+    @Enumerated(EnumType.STRING)
+    private AddressType addressType;
 
     public Long getUserAddressEntityId() {
         return addressEntity.getId();

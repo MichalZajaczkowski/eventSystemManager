@@ -2,6 +2,7 @@ package com.example.eventsystemmanager.user;
 
 import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -35,6 +36,7 @@ public class UserDto {
     private String email;
     private String phone;
     private UserStatus userStatus;
+    private AddressType addressType;
 
 
     public UserEntity toUser() {
@@ -47,7 +49,8 @@ public class UserDto {
                 password,
                 email,
                 phone,
-                UserStatus.NIEAKTYWNY
+                UserStatus.NIEAKTYWNY,
+                AddressType.fromValue(0)
         );
     }
     public void setUserAddressToDto(AddressEntity addressEntity) {
