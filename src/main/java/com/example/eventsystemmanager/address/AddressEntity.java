@@ -1,4 +1,4 @@
-package com.example.eventsystemmanager.user.userAddress;
+package com.example.eventsystemmanager.address;
 
 import lombok.*;
 
@@ -12,10 +12,11 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Entity
-@Table(name = "user_address")
-public class UserAddressEntity {
+@Table(name = "addresses")
+public class AddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, name = "id")
     private Long id;
 
     @Column(name = "country")
@@ -36,7 +37,7 @@ public class UserAddressEntity {
     @Column(name = "post_code")
     private Integer postCode;
 
-    public void updateFieldsFromDto(UserAddressDto dto) {
+    public void updateFieldsFromDto(AddressDto dto) {
         if (dto.getCountry() != null) {
             this.setCountry(dto.getCountry());
         }

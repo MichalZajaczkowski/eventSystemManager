@@ -1,7 +1,8 @@
 package com.example.eventsystemmanager.user;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -22,7 +23,7 @@ public class UserDto {
     @NotBlank
     private Long id;
     @NotBlank
-    private UserAddressDto userAddress;
+    private AddressDto userAddress;
     @NotBlank
     private String userName;
     @NotBlank
@@ -35,6 +36,7 @@ public class UserDto {
     private String email;
     private String phone;
     private UserStatus userStatus;
+    private AddressType addressType;
 
 
     public UserEntity toUser() {
@@ -47,14 +49,15 @@ public class UserDto {
                 password,
                 email,
                 phone,
-                UserStatus.NIEAKTYWNY
+                UserStatus.NIEAKTYWNY,
+                AddressType.fromValue(0)
         );
     }
-    public void setUserAddressToDto(UserAddressEntity userAddressEntity) {
-        this.userAddress = new UserAddressDto(userAddressEntity);
+    public void setUserAddressToDto(AddressEntity addressEntity) {
+        this.userAddress = new AddressDto(addressEntity);
     }
 
     public void setUserAddressToDtoId(Long userAddressEntityId) {
-        this.userAddress = new UserAddressDto(userAddressEntityId);
+        this.userAddress = new AddressDto(userAddressEntityId);
     }
 }
