@@ -55,7 +55,7 @@ public class UserService {
     }
 
     public UserDto createUser(UserDto userDto) {
-        UserEntity userEntity = userDto.toUser();
+        UserEntity userEntity = userDto.toUserEntity();
 
         if (userDto.getUserAddress() != null) {
             UserAddressDto userAddressDto = userDto.getUserAddress();
@@ -89,7 +89,7 @@ public class UserService {
         } else {
             userAddressRepository.save(userDto.getUserAddress().toUserAddress());
         }
-        userRepository.save(userDto.toUser());
+        userRepository.save(userDto.toUserEntity());
     }
 
     public void partialUpdateUser(UserDto userDto) {
