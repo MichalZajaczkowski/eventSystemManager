@@ -1,7 +1,8 @@
 package com.example.eventsystemmanager.place;
 
 //import com.example.eventsystemmanager.place.placeStatus.PlaceStatus;
-import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -22,22 +23,25 @@ public class PlaceDto {
     private Long id;
     @NotNull
     @Valid
-    private UserAddressDto userAddress;
+    private AddressDto placeAddressDto;
     @NotBlank
     private String name;
     @NotBlank
     private String shortName;
     @NotBlank
     private String description;
+
+    private AddressType addressType;
 //    private PlaceStatus placeStatus;
 
     public PlaceEntity toPlaceEntity() {
         return new PlaceEntity(
                 id,
-                userAddress.toUserAddress(),
+                placeAddressDto.toUserAddress(),
                 name,
                 shortName,
-                description
+                description,
+                AddressType.fromValue(1)
 //                PlaceStatus.IN_PROGRESS
         );
     }

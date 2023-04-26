@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.place;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,8 +26,8 @@ public class PlaceEntity {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "user_address_id")
-    private UserAddressEntity userAddressEntity;
+    @JoinColumn(name = "address_id")
+    private AddressEntity placeAddressEntity;
 
     @NotBlank
     @Size(max = 255)
@@ -40,4 +41,6 @@ public class PlaceEntity {
     @Size(max = 1000)
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private AddressType addressType;
 }
