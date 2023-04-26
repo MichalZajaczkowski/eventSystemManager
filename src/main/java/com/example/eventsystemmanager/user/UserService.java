@@ -87,7 +87,7 @@ public class UserService {
         } else if (addressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
             throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
         } else {
-            addressRepository.save(userDto.getUserAddress().toUserAddress());
+            addressRepository.save(userDto.getUserAddress().toAddress());
         }
         userRepository.save(userDto.toUserEntity());
     }
