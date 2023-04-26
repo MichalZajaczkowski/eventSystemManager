@@ -1,38 +1,39 @@
 package com.example.eventsystemmanager.place;
 
-import com.example.eventsystemmanager.user.userAddress.UserAddressDto;
-import com.example.eventsystemmanager.user.userAddress.UserAddressEntity;
-import com.example.eventsystemmanager.user.userAddress.UserAddressMapper;
-import com.example.eventsystemmanager.user.userAddress.UserAddressRepository;
+
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
+import com.example.eventsystemmanager.address.AddressMapper;
+import com.example.eventsystemmanager.address.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class PlaceService {
-    private final UserAddressRepository userAddressRepository;
-    private final UserAddressMapper userAddressMapper;
+    private final AddressRepository placeAddressRepository;
+    private final AddressMapper userAddressMapper;
     private final PlaceRepository placeRepository;
 
     public PlaceDto createPlace(PlaceDto placeDto) {
         PlaceEntity placeEntity = placeDto.toPlaceEntity();
 
-        if(placeDto.getUserAddress() != null) {
-            UserAddressDto userAddressDto = placeDto.getUserAddress();
+        if(placeDto.getPlaceAddress() != null) {
+            AddressDto addressDto = placeDto.getPlaceAddress();
 
             // Check if an address with the same fields already exists in the database
-            UserAddressEntity existingAddress = userAddressRepository.findByIdOrFindByAddressFields(userAddressDto.getId(),
-                    userAddressDto.getCountry(), userAddressDto.getCity(), userAddressDto.getStreet(), userAddressDto.getBuildingNumber(),
-                    userAddressDto.getLocalNumber(), userAddressDto.getPostCode());
+            AddressEntity existingAddress = placeAddressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
+                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
+                    addressDto.getLocalNumber(), addressDto.getPostCode());
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
-                placeEntity.setUserAddressEntity(existingAddress);
+                placeEntity.setPlaceAddressEntity(existingAddress);
             } else {
                 // Create a new user address with a new id
-                UserAddressEntity newAddress = userAddressMapper.userAddressMapToEntity(userAddressDto);
-                newAddress = userAddressRepository.save(newAddress);
-                placeEntity.setUserAddressEntity(newAddress);
+                AddressEntity newAddress = userAddressMapper.addressMapToEntity(addressDto);
+                newAddress = placeAddressRepository.save(newAddress);
+                placeEntity.setPlaceAddressEntity(newAddress);
             }
         }
 
