@@ -22,6 +22,7 @@ public class PlaceDto {
     @NotBlank
     private Long id;
     @NotNull
+    @Valid
     private AddressDto placeAddress;
     @NotBlank
     private String name;
@@ -41,9 +42,7 @@ public class PlaceDto {
                 name,
                 shortName,
                 description,
-                quantityAvailablePlaces,
-                AddressType.fromValue(1)
-//                PlaceStatus.IN_PROGRESS
+                quantityAvailablePlaces
         );
     }
 }
