@@ -44,7 +44,7 @@ public class AddressDto {
         this.id = id;
     }
 
-    public AddressEntity toUserAddress() {
+    public AddressEntity toAddress() {
         return new AddressEntity(
                 id,
                 country,
