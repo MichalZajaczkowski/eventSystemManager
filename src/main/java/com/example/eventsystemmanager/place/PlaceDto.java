@@ -22,14 +22,14 @@ public class PlaceDto {
     @NotBlank
     private Long id;
     @NotNull
-    @Valid
-    private AddressDto placeAddressDto;
+    private AddressDto placeAddress;
     @NotBlank
     private String name;
     @NotBlank
     private String shortName;
     @NotBlank
     private String description;
+    private Integer quantityAvailablePlaces;
 
     private AddressType addressType;
 //    private PlaceStatus placeStatus;
@@ -37,10 +37,11 @@ public class PlaceDto {
     public PlaceEntity toPlaceEntity() {
         return new PlaceEntity(
                 id,
-                placeAddressDto.toUserAddress(),
+                placeAddress.toAddress(),
                 name,
                 shortName,
                 description,
+                quantityAvailablePlaces,
                 AddressType.fromValue(1)
 //                PlaceStatus.IN_PROGRESS
         );
