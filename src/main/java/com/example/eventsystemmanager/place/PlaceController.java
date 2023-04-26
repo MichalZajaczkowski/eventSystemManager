@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -24,5 +23,23 @@ public class PlaceController {
         PlaceDto savedPlaceDto = placeService.createPlace(placeDto);
         log.info("Log: Place was created");
         return new ResponseEntity<>(placeDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PlaceDto>> getPlaces() {
+        List<PlaceDto> result = placeService.findAll();
+//        if (result.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(result);
+//        }
+        return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PlaceDto> getProduct(@PathVariable Long id) {
+        PlaceDto place = placeService.findById(id);
+        log.info("Place found: " + placeService.findById(id));
+        return place != null ? ResponseEntity.ok(place) : ResponseEntity.notFound().build();
     }
 }

@@ -2,6 +2,7 @@ package com.example.eventsystemmanager.place;
 
 //import com.example.eventsystemmanager.place.placeStatus.PlaceStatus;
 import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -34,6 +35,10 @@ public class PlaceDto {
 
     private AddressType addressType;
 //    private PlaceStatus placeStatus;
+
+    public void setPlaceAddressToDto(AddressEntity addressEntity) {
+        this.placeAddress = new AddressDto(addressEntity);
+    }
 
     public PlaceEntity toPlaceEntity() {
         return new PlaceEntity(

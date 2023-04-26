@@ -6,8 +6,11 @@ import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.example.eventsystemmanager.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -41,6 +44,30 @@ public class PlaceService {
         }
 
         placeRepository.save(placeEntity);
+        return placeDto;
+    }
+
+    public List<PlaceDto> findAll() {
+        return placeRepository.findAll()
+                .stream()
+                .map(this::mapAddressToDto)
+                .toList();
+    }
+
+    public PlaceDto findById(Long id) {
+        return placeRepository.findById(id)
+                .map(this::mapAddressToDto)
+                .orElseThrow( () -> new IllegalArgumentException("dodać stały tekst do wyjątku"));
+    }
+
+    private PlaceDto mapAddressToDto(PlaceEntity placeEntity) {
+        PlaceDto placeDto = new PlaceDto();
+        placeDto.setId(placeEntity.getId());
+        placeDto.setName(placeEntity.getName());
+        placeDto.setShortName(placeEntity.getShortName());
+        placeDto.setDescription(placeEntity.getDescription());
+        placeDto.setQuantityAvailablePlaces(placeEntity.getQuantityAvailablePlaces());
+        placeDto.setPlaceAddressToDto(placeEntity.getPlaceAddressEntity());
         return placeDto;
     }
 }
