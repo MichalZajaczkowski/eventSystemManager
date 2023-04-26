@@ -3,6 +3,7 @@ package com.example.eventsystemmanager.user;
 import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.status.StatusRepository;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
@@ -68,9 +69,11 @@ public class UserService {
             if (existingAddress != null) {
                 // Set the existing user address id for the user
                 userEntity.setAddressEntity(existingAddress);
+                existingAddress.setAddressType(AddressType.USER_ADDRESS);
             } else {
                 // Create a new user address with a new id
                 AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
+                newAddress.setAddressType(AddressType.USER_ADDRESS);
                 newAddress = addressRepository.save(newAddress);
                 userEntity.setAddressEntity(newAddress);
             }
