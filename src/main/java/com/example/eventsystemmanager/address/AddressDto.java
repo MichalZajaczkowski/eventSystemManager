@@ -1,9 +1,12 @@
 package com.example.eventsystemmanager.address;
 
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 
 @Getter
@@ -29,6 +32,8 @@ public class AddressDto {
     private Integer localNumber;
     @NotBlank
     private Integer postCode;
+    @Enumerated(EnumType.STRING)
+    private AddressType addressType;
 
     public AddressDto(AddressEntity addressEntity) {
         this.id = addressEntity.getId();
@@ -52,7 +57,8 @@ public class AddressDto {
                 street,
                 buildingNumber,
                 localNumber,
-                postCode
+                postCode,
+                addressType
         );
     }
 }

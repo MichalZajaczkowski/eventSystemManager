@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.address;
 
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -36,6 +37,9 @@ public class AddressEntity {
 
     @Column(name = "post_code")
     private Integer postCode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "address_type")
+    private AddressType addressType;
 
     public void updateFieldsFromDto(AddressDto dto) {
         if (dto.getCountry() != null) {
