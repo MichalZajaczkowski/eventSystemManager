@@ -37,10 +37,10 @@ public class PlaceEntity {
     @Size(max = 50)
     private String shortName;
 
-    @NotBlank
-    @Size(max = 1000)
+    @NotBlank(message = "Description cannot be null")
+    @Size(min = 10,max = 1000, message = "Enter a description")
     private String description;
-
+    private Integer quantityAvailablePlaces;
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
 }
