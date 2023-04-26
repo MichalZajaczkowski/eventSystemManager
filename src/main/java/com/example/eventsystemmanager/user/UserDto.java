@@ -49,8 +49,7 @@ public class UserDto {
                 password,
                 email,
                 phone,
-                UserStatus.NIEAKTYWNY,
-                AddressType.fromValue(0)
+                UserStatus.NIEAKTYWNY
         );
     }
     public void setUserAddressToDto(AddressEntity addressEntity) {
