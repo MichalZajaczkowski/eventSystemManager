@@ -1,7 +1,6 @@
 package com.example.eventsystemmanager.place;
 
 import com.example.eventsystemmanager.address.AddressEntity;
-import com.example.eventsystemmanager.address.addressType.AddressType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,6 +40,4 @@ public class PlaceEntity {
     @Size(min = 10,max = 1000, message = "Enter a description")
     private String description;
     private Integer quantityAvailablePlaces;
-    @Enumerated(EnumType.STRING)
-    private AddressType addressType;
 }
