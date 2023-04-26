@@ -5,6 +5,7 @@ import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.address.AddressRepository;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +30,11 @@ public class PlaceService {
             if (existingAddress != null) {
                 // Set the existing user address id for the user
                 placeEntity.setPlaceAddressEntity(existingAddress);
+                existingAddress.setAddressType(AddressType.PLACE_ADDRESS);
             } else {
                 // Create a new user address with a new id
                 AddressEntity newAddress = userAddressMapper.addressMapToEntity(addressDto);
+                newAddress.setAddressType(AddressType.PLACE_ADDRESS);
                 newAddress = placeAddressRepository.save(newAddress);
                 placeEntity.setPlaceAddressEntity(newAddress);
             }
