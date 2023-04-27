@@ -32,8 +32,6 @@ public class PlaceDto {
     @NotBlank
     private String description;
     private Integer quantityAvailablePlaces;
-
-    private AddressType addressType;
 //    private PlaceStatus placeStatus;
 
     public void setPlaceAddressToDto(AddressEntity addressEntity) {
