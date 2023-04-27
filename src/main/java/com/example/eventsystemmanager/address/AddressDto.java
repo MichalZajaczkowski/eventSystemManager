@@ -49,7 +49,7 @@ public class AddressDto {
         this.id = id;
     }
 
-    public AddressEntity toAddress() {
+    public AddressEntity toAddressEntity() {
         return new AddressEntity(
                 id,
                 country,
