@@ -1,5 +1,7 @@
 package com.example.eventsystemmanager.place;
 
+import com.example.eventsystemmanager.address.AddressDto;
+import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,5 +51,11 @@ public class PlaceController {
         placeService.partialUpdatePlaceData(placeId, placeDto);
         log.debug("Log: Place was updated");
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/{placeId}/updateAddressForPlace")
+    public ResponseEntity<AddressDto> updateAddressForPlace(@PathVariable Long placeId, @RequestBody AddressDto addressDto) {
+        AddressEntity updatedAddress = placeService.updateAddressForPlace(placeId, addressDto);
+        return new ResponseEntity<>(addressMapper.addressMapToDto(updatedAddress), HttpStatus.OK);
     }
 }
