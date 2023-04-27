@@ -90,7 +90,7 @@ public class UserService {
         } else if (addressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
             throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
         } else {
-            addressRepository.save(userDto.getUserAddress().toAddress());
+            addressRepository.save(userDto.getUserAddress().toAddressEntity());
         }
         userRepository.save(userDto.toUserEntity());
     }
@@ -136,6 +136,18 @@ public class UserService {
         return newAddress;
     }
 
+    public AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
+        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(),
+                newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(),
+                newAddress.getLocalNumber(), newAddress.getPostCode(), newAddress.getAddressType());
+        if (existingAddress != null) {
+            newAddress = existingAddress;
+        } else {
+            newAddress = addressRepository.save(newAddress);
+        }
+        return newAddress;
+    }
+
     public AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
         if (newAddress.getId() == null) {
             newAddress = addressRepository.save(newAddress);
@@ -147,18 +159,6 @@ public class UserService {
                 throw new IllegalArgumentException("Nie znaleziono adresu o podanym id: " + newAddress.getId());
             }
             newAddress.updateFieldsFromDto(addressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
-        }
-        return newAddress;
-    }
-
-    public AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
-        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(),
-                newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(),
-                newAddress.getLocalNumber(), newAddress.getPostCode(), newAddress.getAddressType());
-        if (existingAddress != null) {
-            newAddress = existingAddress;
-        } else {
-            newAddress = addressRepository.save(newAddress);
         }
         return newAddress;
     }

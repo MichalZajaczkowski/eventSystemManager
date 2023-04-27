@@ -42,7 +42,7 @@ public class UserDto {
     public UserEntity toUserEntity() {
         return new UserEntity(
                 id,
-                userAddress.toAddress(),
+                userAddress.toAddressEntity(),
                 userName,
                 userSurname,
                 login,
