@@ -58,4 +58,11 @@ public class PlaceController {
         AddressEntity updatedAddress = placeService.updateAddressForPlace(placeId, addressDto);
         return new ResponseEntity<>(addressMapper.addressMapToDto(updatedAddress), HttpStatus.OK);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        placeService.removePlace(id);
+        log.debug("log: Place removed successfully.");
+        return ResponseEntity.noContent().build();
+    }
+
 }
