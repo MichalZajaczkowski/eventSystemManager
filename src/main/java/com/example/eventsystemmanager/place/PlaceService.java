@@ -6,7 +6,10 @@ import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.example.eventsystemmanager.user.UserEntity;
+import com.example.eventsystemmanager.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +25,10 @@ public class PlaceService {
     private final AddressMapper userAddressMapper;
     private final PlaceRepository placeRepository;
 
+    private final AddressMapper addressMapper;
+    @Autowired
+    private UserService userService;
+
     public PlaceDto createPlace(PlaceDto placeDto) {
         PlaceEntity placeEntity = placeDto.toPlaceEntity();
 
@@ -31,7 +38,7 @@ public class PlaceService {
             // Check if an address with the same fields already exists in the database
             AddressEntity existingAddress = placeAddressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
                     addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
-                    addressDto.getLocalNumber(), addressDto.getPostCode());
+                    addressDto.getLocalNumber(), addressDto.getPostCode(), addressDto.getAddressType());
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
@@ -91,6 +98,23 @@ public class PlaceService {
             placeToUpdate.setQuantityAvailablePlaces(placeDto.getQuantityAvailablePlaces());
         }
         placeRepository.save(placeToUpdate);
+    }
+
+    public AddressEntity updateAddressForPlace(Long placeId, AddressDto addressDto) {
+        PlaceEntity placeAddressToUpdate = placeRepository.findById(placeId)
+                .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
+
+        AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
+        // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
+        newAddress.setAddressType(AddressType.PLACE_ADDRESS);
+        newAddress = userService.checkIfAnotherUserIsAlreadyAssignedTheSameAddress(newAddress);
+        // Jeśli id adresu nie zostało podane, to zapisz nowy adres
+        newAddress.setAddressType(AddressType.PLACE_ADDRESS);
+        newAddress = userService.ifTheAddressIdIsNotGivenSaveTheNewAddress(addressDto, newAddress);
+        // Aktualizuj adres tylko dla aktualizowanego użytkownika
+        placeAddressToUpdate.setPlaceAddressEntity(newAddress);
+        placeRepository.save(placeAddressToUpdate);
+        return newAddress;
     }
 
     private PlaceDto mapAddressToDto(PlaceEntity placeEntity) {
