@@ -6,15 +6,18 @@ import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.address.addressType.AddressType;
-import com.example.eventsystemmanager.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @RequiredArgsConstructor
 @Service
 public class PlaceService {
+
+    private static final String PLACE_WITH_ID_DOES_NOT_EXIST = "Place with id " + id + " does not exist.";
     private final AddressRepository placeAddressRepository;
     private final AddressMapper userAddressMapper;
     private final PlaceRepository placeRepository;
@@ -57,7 +60,37 @@ public class PlaceService {
     public PlaceDto findById(Long id) {
         return placeRepository.findById(id)
                 .map(this::mapAddressToDto)
-                .orElseThrow( () -> new IllegalArgumentException("dodać stały tekst do wyjątku"));
+                .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
+    }
+
+    public void updatePlaceData(Long placeId, PlaceDto placeDto) {
+        PlaceEntity placeToUpdate = placeRepository.findById(placeId)
+                .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
+
+        placeToUpdate.setName(placeDto.getName());
+        placeToUpdate.setShortName(placeDto.getShortName());
+        placeToUpdate.setDescription(placeDto.getDescription());
+        placeToUpdate.setQuantityAvailablePlaces(placeDto.getQuantityAvailablePlaces());
+
+        placeRepository.save(placeToUpdate);
+    }
+
+    public void partialUpdatePlaceData(Long placeId, PlaceDto placeDto) {
+        PlaceEntity placeToUpdate = placeRepository.findById(placeId)
+                .orElseThrow(() -> new IllegalStateException(PLACE_WITH_ID_DOES_NOT_EXIST));
+        if (placeDto.getName() != null) {
+            placeToUpdate.setName(placeDto.getName());
+        }
+        if (placeDto.getShortName() != null) {
+            placeToUpdate.setShortName(placeDto.getShortName());
+        }
+        if (placeDto.getDescription() != null) {
+            placeToUpdate.setDescription(placeDto.getDescription());
+        }
+        if (placeDto.getQuantityAvailablePlaces() != null) {
+            placeToUpdate.setQuantityAvailablePlaces(placeDto.getQuantityAvailablePlaces());
+        }
+        placeRepository.save(placeToUpdate);
     }
 
     private PlaceDto mapAddressToDto(PlaceEntity placeEntity) {
