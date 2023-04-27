@@ -39,18 +39,17 @@ public class UserDto {
     private AddressType addressType;
 
 
-    public UserEntity toUser() {
+    public UserEntity toUserEntity() {
         return new UserEntity(
                 id,
-                userAddress.toUserAddress(),
+                userAddress.toAddressEntity(),
                 userName,
                 userSurname,
                 login,
                 password,
                 email,
                 phone,
-                UserStatus.NIEAKTYWNY,
-                AddressType.fromValue(0)
+                UserStatus.NIEAKTYWNY
         );
     }
     public void setUserAddressToDto(AddressEntity addressEntity) {

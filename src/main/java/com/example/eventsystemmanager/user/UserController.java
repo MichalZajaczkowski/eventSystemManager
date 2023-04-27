@@ -35,7 +35,7 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Users cannot be found")
     })
     @GetMapping
-    public ResponseEntity<List<UserDto>> getMovies() {
+    public ResponseEntity<List<UserDto>> getUsers() {
         List<UserDto> user = userService.findAll();
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();

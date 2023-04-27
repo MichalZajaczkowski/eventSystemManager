@@ -45,7 +45,7 @@ public class AddressService {
         if (addressRepository.findById(id).isPresent()) {
             throw new IllegalArgumentException("UserAddress with id " + id + " already exists");
         } else {
-            addressRepository.save(addressDto.toUserAddress());
+            addressRepository.save(addressDto.toAddressEntity());
         }
     }
 

@@ -2,8 +2,8 @@ package com.example.eventsystemmanager.address.addressType;
 
 public enum AddressType {
 
-    USERADDRESS("User Address", 0),
-    PLACEADDRESS("Place Address", 1);
+    USER_ADDRESS("User Address", 0),
+    PLACE_ADDRESS("Place Address", 1);
     private final String name;
     private final Integer value;
 

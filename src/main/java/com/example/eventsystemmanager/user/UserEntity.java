@@ -45,8 +45,8 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    @Enumerated(EnumType.STRING)
-    private AddressType addressType;
+//    @Enumerated(EnumType.STRING)
+//    private AddressType addressType;
 
     public Long getUserAddressEntityId() {
         return addressEntity.getId();

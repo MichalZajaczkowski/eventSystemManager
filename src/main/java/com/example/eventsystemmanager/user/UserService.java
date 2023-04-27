@@ -3,6 +3,7 @@ package com.example.eventsystemmanager.user;
 import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
+import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.status.StatusRepository;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
@@ -55,15 +56,16 @@ public class UserService {
     }
 
     public UserDto createUser(UserDto userDto) {
-        UserEntity userEntity = userDto.toUser();
+        UserEntity userEntity = userDto.toUserEntity();
 
         if (userDto.getUserAddress() != null) {
             AddressDto addressDto = userDto.getUserAddress();
 
             // Check if an address with the same fields already exists in the database
-            AddressEntity existingAddress = addressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
-                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
-                    addressDto.getLocalNumber(), addressDto.getPostCode());
+            AddressEntity existingAddress = addressRepository.findByAddressFields(
+                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(),
+                    addressDto.getBuildingNumber(), addressDto.getLocalNumber(), addressDto.getPostCode(),
+                    AddressType.USER_ADDRESS);
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
@@ -71,11 +73,11 @@ public class UserService {
             } else {
                 // Create a new user address with a new id
                 AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
+                newAddress.setAddressType(AddressType.USER_ADDRESS);
                 newAddress = addressRepository.save(newAddress);
                 userEntity.setAddressEntity(newAddress);
             }
         }
-
         userRepository.save(userEntity);
         return userDto;
     }
@@ -87,9 +89,9 @@ public class UserService {
         } else if (addressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
             throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
         } else {
-            addressRepository.save(userDto.getUserAddress().toUserAddress());
+            addressRepository.save(userDto.getUserAddress().toAddressEntity());
         }
-        userRepository.save(userDto.toUser());
+        userRepository.save(userDto.toUserEntity());
     }
 
     public void partialUpdateUser(UserDto userDto) {
@@ -122,8 +124,10 @@ public class UserService {
 
         AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
         // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
+        newAddress.setAddressType(AddressType.USER_ADDRESS);
         newAddress = checkIfAnotherUserIsAlreadyAssignedTheSameAddress(newAddress);
         // Jeśli id adresu nie zostało podane, to zapisz nowy adres
+        newAddress.setAddressType(AddressType.USER_ADDRESS);
         newAddress = ifTheAddressIdIsNotGivenSaveTheNewAddress(addressDto, newAddress);
         // Aktualizuj adres tylko dla aktualizowanego użytkownika
         user.setAddressEntity(newAddress);
@@ -131,7 +135,19 @@ public class UserService {
         return newAddress;
     }
 
-    private AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
+    public AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
+        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(),
+                newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(),
+                newAddress.getLocalNumber(), newAddress.getPostCode(), newAddress.getAddressType());
+        if (existingAddress != null) {
+            newAddress = existingAddress;
+        } else {
+            newAddress = addressRepository.save(newAddress);
+        }
+        return newAddress;
+    }
+
+    public AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
         if (newAddress.getId() == null) {
             newAddress = addressRepository.save(newAddress);
         } else { // W przeciwnym wypadku, zaktualizuj istniejący adres
@@ -142,16 +158,6 @@ public class UserService {
                 throw new IllegalArgumentException("Nie znaleziono adresu o podanym id: " + newAddress.getId());
             }
             newAddress.updateFieldsFromDto(addressDto); // Metoda w UserAddressEntity aktualizująca pola na podstawie DTO
-        }
-        return newAddress;
-    }
-
-    private AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
-        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
-        if (existingAddress != null) {
-            newAddress = existingAddress;
-        } else {
-            newAddress = addressRepository.save(newAddress);
         }
         return newAddress;
     }
