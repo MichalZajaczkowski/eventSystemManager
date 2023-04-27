@@ -62,14 +62,14 @@ public class UserService {
             AddressDto addressDto = userDto.getUserAddress();
 
             // Check if an address with the same fields already exists in the database
-            AddressEntity existingAddress = addressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
-                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
-                    addressDto.getLocalNumber(), addressDto.getPostCode(), addressDto.getAddressType());
+            AddressEntity existingAddress = addressRepository.findByAddressFields(
+                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(),
+                    addressDto.getBuildingNumber(), addressDto.getLocalNumber(), addressDto.getPostCode(),
+                    AddressType.USER_ADDRESS);
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
                 userEntity.setAddressEntity(existingAddress);
-                existingAddress.setAddressType(AddressType.USER_ADDRESS);
             } else {
                 // Create a new user address with a new id
                 AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
@@ -78,7 +78,6 @@ public class UserService {
                 userEntity.setAddressEntity(newAddress);
             }
         }
-
         userRepository.save(userEntity);
         return userDto;
     }

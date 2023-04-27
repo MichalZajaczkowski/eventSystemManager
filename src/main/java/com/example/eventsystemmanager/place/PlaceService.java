@@ -32,20 +32,17 @@ public class PlaceService {
     public PlaceDto createPlace(PlaceDto placeDto) {
         PlaceEntity placeEntity = placeDto.toPlaceEntity();
 
-        if(placeDto.getPlaceAddress() != null) {
+        if (placeDto.getPlaceAddress() != null) {
             AddressDto addressDto = placeDto.getPlaceAddress();
 
-            // Check if an address with the same fields already exists in the database
-            AddressEntity existingAddress = placeAddressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
-                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
-                    addressDto.getLocalNumber(), addressDto.getPostCode(), addressDto.getAddressType());
+            AddressEntity existingAddress = placeAddressRepository.findByAddressFields(
+                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(),
+                    addressDto.getBuildingNumber(), addressDto.getLocalNumber(), addressDto.getPostCode(),
+                    AddressType.PLACE_ADDRESS);
 
             if (existingAddress != null) {
-                // Set the existing user address id for the user
                 placeEntity.setPlaceAddressEntity(existingAddress);
-                existingAddress.setAddressType(AddressType.PLACE_ADDRESS);
             } else {
-                // Create a new user address with a new id
                 AddressEntity newAddress = userAddressMapper.addressMapToEntity(addressDto);
                 newAddress.setAddressType(AddressType.PLACE_ADDRESS);
                 newAddress = placeAddressRepository.save(newAddress);
