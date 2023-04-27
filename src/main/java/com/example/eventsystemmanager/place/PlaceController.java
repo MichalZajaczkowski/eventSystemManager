@@ -28,11 +28,6 @@ public class PlaceController {
     @GetMapping
     public ResponseEntity<List<PlaceDto>> getPlaces() {
         List<PlaceDto> result = placeService.findAll();
-//        if (result.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        } else {
-//            return ResponseEntity.ok(result);
-//        }
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }
 
@@ -41,5 +36,18 @@ public class PlaceController {
         PlaceDto place = placeService.findById(id);
         log.info("Place found: " + placeService.findById(id));
         return place != null ? ResponseEntity.ok(place) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{placeId}/updatePlaceData")
+    public ResponseEntity<PlaceDto> updatePlaceData(@PathVariable Long placeId,@RequestBody PlaceDto placeDto) {
+        placeService.updatePlaceData(placeId, placeDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/{placeId}/partialUpdatePlaceData")
+    public ResponseEntity<PlaceDto> partialUpdatePlaceData(@PathVariable Long placeId,@RequestBody PlaceDto placeDto) {
+        placeService.partialUpdatePlaceData(placeId, placeDto);
+        log.debug("Log: Place was updated");
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
