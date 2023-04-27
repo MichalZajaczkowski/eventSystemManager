@@ -64,7 +64,7 @@ public class UserService {
             // Check if an address with the same fields already exists in the database
             AddressEntity existingAddress = addressRepository.findByIdOrFindByAddressFields(addressDto.getId(),
                     addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(), addressDto.getBuildingNumber(),
-                    addressDto.getLocalNumber(), addressDto.getPostCode());
+                    addressDto.getLocalNumber(), addressDto.getPostCode(), addressDto.getAddressType());
 
             if (existingAddress != null) {
                 // Set the existing user address id for the user
@@ -125,8 +125,10 @@ public class UserService {
 
         AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
         // Sprawdź czy inny użytkownik nie ma już przypisanego tego samego adresu
+        newAddress.setAddressType(AddressType.USER_ADDRESS);
         newAddress = checkIfAnotherUserIsAlreadyAssignedTheSameAddress(newAddress);
         // Jeśli id adresu nie zostało podane, to zapisz nowy adres
+        newAddress.setAddressType(AddressType.USER_ADDRESS);
         newAddress = ifTheAddressIdIsNotGivenSaveTheNewAddress(addressDto, newAddress);
         // Aktualizuj adres tylko dla aktualizowanego użytkownika
         user.setAddressEntity(newAddress);
@@ -134,7 +136,7 @@ public class UserService {
         return newAddress;
     }
 
-    private AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
+    public AddressEntity ifTheAddressIdIsNotGivenSaveTheNewAddress(AddressDto addressDto, AddressEntity newAddress) {
         if (newAddress.getId() == null) {
             newAddress = addressRepository.save(newAddress);
         } else { // W przeciwnym wypadku, zaktualizuj istniejący adres
@@ -149,8 +151,10 @@ public class UserService {
         return newAddress;
     }
 
-    private AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
-        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(), newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(), newAddress.getLocalNumber(), newAddress.getPostCode());
+    public AddressEntity checkIfAnotherUserIsAlreadyAssignedTheSameAddress(AddressEntity newAddress) {
+        AddressEntity existingAddress = addressRepository.findByAddressFields(newAddress.getCountry(),
+                newAddress.getCity(), newAddress.getStreet(), newAddress.getBuildingNumber(),
+                newAddress.getLocalNumber(), newAddress.getPostCode(), newAddress.getAddressType());
         if (existingAddress != null) {
             newAddress = existingAddress;
         } else {
