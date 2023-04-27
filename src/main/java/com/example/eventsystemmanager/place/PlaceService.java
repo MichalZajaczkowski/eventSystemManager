@@ -117,6 +117,12 @@ public class PlaceService {
         return newAddress;
     }
 
+    public void removePlace(Long id) {
+        PlaceEntity placeToRemove = placeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
+        placeRepository.delete(placeToRemove);
+    }
+
     private PlaceDto mapAddressToDto(PlaceEntity placeEntity) {
         PlaceDto placeDto = new PlaceDto();
         placeDto.setId(placeEntity.getId());
