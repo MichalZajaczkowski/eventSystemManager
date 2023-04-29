@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.place;
 
 //import com.example.eventsystemmanager.place.placeStatus.PlaceStatus;
+
 import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,6 +33,15 @@ public class PlaceDto {
     private String description;
     private Integer quantityAvailablePlaces;
 //    private PlaceStatus placeStatus;
+
+
+    public PlaceDto(PlaceEntity placeEntity) {
+        this.id = placeEntity.getId();
+        this.name = placeEntity.getName();
+        this.shortName = placeEntity.getShortName();
+        this.description = placeEntity.getDescription();
+        this.quantityAvailablePlaces = placeEntity.getQuantityAvailablePlaces();
+    }
 
     public void setPlaceAddressToDto(AddressEntity addressEntity) {
         this.placeAddress = new AddressDto(addressEntity);

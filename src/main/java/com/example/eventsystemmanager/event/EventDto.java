@@ -1,10 +1,14 @@
 package com.example.eventsystemmanager.event;
 
 import com.example.eventsystemmanager.category.CategoryDto;
+import com.example.eventsystemmanager.category.CategoryEntity;
 import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
+import com.example.eventsystemmanager.organizer.OrganizerEntity;
 import com.example.eventsystemmanager.place.PlaceDto;
+import com.example.eventsystemmanager.place.PlaceEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.EnumType;
@@ -15,11 +19,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDto {
 
     private Long id;
@@ -60,4 +65,16 @@ public class EventDto {
 
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyDate;
+
+    public void setPlaceToDto (PlaceEntity placeEntity) {
+        this.place = new PlaceDto(placeEntity);
+    }
+
+    public void setOrganizerToDto(OrganizerEntity organizerEntity) {
+        this.organizer = new OrganizerDto(organizerEntity);
+    }
+
+    public void setCategoryToDto(CategoryEntity category) {
+        this.category = new CategoryEntity(category);
+    }
 }

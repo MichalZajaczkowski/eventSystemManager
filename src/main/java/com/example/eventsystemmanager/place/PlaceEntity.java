@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @ToString
+@Builder
 @Entity
 @Table(name = "places")
 public class PlaceEntity {

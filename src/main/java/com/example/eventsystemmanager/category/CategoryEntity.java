@@ -20,4 +20,8 @@ public class CategoryEntity {
     @Column(name = "description")
     private String description;
 
+    public CategoryEntity(CategoryEntity category) {
+        this.id = category.getId();
+        this.description = category.getDescription();
+    }
 }
