@@ -41,3 +41,4 @@ public class PlaceEntity {
     private String description;
     private Integer quantityAvailablePlaces;
 }
+// TODO: 29.04.2023 add date of creat and mod place
