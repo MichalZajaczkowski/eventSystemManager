@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.event;
 
 import com.example.eventsystemmanager.category.CategoryEntity;
+import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.organizer.OrganizerEntity;
 import com.example.eventsystemmanager.place.PlaceEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;

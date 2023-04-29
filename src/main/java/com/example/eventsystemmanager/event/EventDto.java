@@ -1,11 +1,14 @@
 package com.example.eventsystemmanager.event;
 
 import com.example.eventsystemmanager.category.CategoryDto;
+import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.place.PlaceDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -29,6 +32,10 @@ public class EventDto {
 
     @NotNull(message = "Category cannot be null")
     private CategoryDto category;
+
+    @NotNull(message = "Event status cannot be null")
+    @Enumerated(EnumType.STRING)
+    private EventStatus eventStatus;
 
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name cannot be longer than 100 characters")
