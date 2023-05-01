@@ -6,12 +6,15 @@ import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.address.AddressRepository;
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.example.eventsystemmanager.exception.DuplicateEntityException;
 import com.example.eventsystemmanager.user.UserEntity;
 import com.example.eventsystemmanager.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.NonUniqueResultException;
 import java.util.List;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -31,7 +34,9 @@ public class PlaceService {
 
     public PlaceDto createPlace(PlaceDto placeDto) {
         PlaceEntity placeEntity = placeDto.toPlaceEntity();
-
+        if (placeRepository.findByName(placeDto.getName()) != null) {
+            throw new IllegalArgumentException("Place with name '" + placeDto.getName() + "' already exists");
+        }
         if (placeDto.getPlaceAddress() != null) {
             AddressDto addressDto = placeDto.getPlaceAddress();
 

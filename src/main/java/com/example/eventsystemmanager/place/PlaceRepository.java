@@ -18,7 +18,8 @@ public interface PlaceRepository extends JpaRepository<PlaceEntity, Long> {
     List<PlaceEntity> findAll();
 
     Optional<PlaceEntity> findById(Long id);
-
+    @Query("SELECT f FROM PlaceEntity f WHERE f.name = :name")
+    PlaceEntity findByName(@Param("name") String name);
     PlaceEntity save(PlaceEntity placeEntity);
 
     @Override
@@ -30,5 +31,5 @@ public interface PlaceRepository extends JpaRepository<PlaceEntity, Long> {
     Optional<Object> findById(SingularAttribute<AbstractPersistable, Serializable> id);
 
     @Query("SELECT f FROM PlaceEntity f WHERE f.placeAddressEntity = :placeAddressEntity AND f.name = :name AND f.shortName = :shortName AND f.description = :description AND f.quantityAvailablePlaces = :quantityAvailablePlaces")
-    boolean findPlaceByFields(@Param("placeAddressEntity") AddressEntity placeAddressEntity, @Param("name") String name, @Param("shortName") String shortName, @Param("description") String description, @Param("quantityAvailablePlaces") Integer quantityAvailablePlaces);
+    PlaceEntity findPlaceByFields(@Param("placeAddressEntity") AddressEntity placeAddressEntity, @Param("name") String name, @Param("shortName") String shortName, @Param("description") String description, @Param("quantityAvailablePlaces") Integer quantityAvailablePlaces);
 }

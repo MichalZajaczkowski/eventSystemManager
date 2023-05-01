@@ -3,6 +3,7 @@ package com.example.eventsystemmanager.place;
 import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
+import com.example.eventsystemmanager.exception.DuplicateEntityException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
