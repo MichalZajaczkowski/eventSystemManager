@@ -40,8 +40,9 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException(CATEGORYWITHIDSTATEMENT));
     }
 
-    public void addCategory(CategoryDto categoryDto) {
+    public CategoryDto addCategory(CategoryDto categoryDto) {
         category(categoryDto);
+        return categoryDto;
     }
 
     public void updateCategory(CategoryDto categoryDto) {
@@ -59,4 +60,5 @@ public class CategoryService {
         }
         categoryRepository.save(categoryDto.toCategory());
     }
+
 }
