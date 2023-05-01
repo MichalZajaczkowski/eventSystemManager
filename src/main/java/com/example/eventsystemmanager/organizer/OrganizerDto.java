@@ -29,11 +29,11 @@ public class OrganizerDto {
         this.description = organizerEntity.getDescription();
     }
 
-    public OrganizerEntity toOrganizer() {
-        OrganizerEntity organizer = new OrganizerEntity();
-        organizer.setId(id);
-        organizer.setName(name);
-        organizer.setDescription(description);
-        return organizer;
+    public OrganizerEntity toOrganizerEntity() {
+        return new OrganizerEntity(
+                id,
+                name,
+                description
+        );
     }
 }
