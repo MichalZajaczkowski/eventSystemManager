@@ -1,7 +1,6 @@
 package com.example.eventsystemmanager.event;
 
-import com.example.eventsystemmanager.category.CategoryDto;
-import com.example.eventsystemmanager.category.CategoryEntity;
+import com.example.eventsystemmanager.category.Category;
 import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.organizer.OrganizerEntity;
@@ -36,7 +35,8 @@ public class EventDto {
     private OrganizerDto organizer;
 
     @NotNull(message = "Category cannot be null")
-    private CategoryDto category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @NotNull(message = "Event status cannot be null")
     @Enumerated(EnumType.STRING)
@@ -74,7 +74,23 @@ public class EventDto {
         this.organizer = new OrganizerDto(organizerEntity);
     }
 
-    public void setCategoryToDto(CategoryEntity category) {
-        this.category = new CategoryEntity(category);
-    }
+//    public void setCategoryToDto(CategoryEntity categoryEntity) {
+//        this.category = new CategoryDto(categoryEntity);
+//    }
+
+//    public EventEntity toEventEntity() {
+//        return new EventEntity(
+//                id,
+//                place.toPlaceEntity(),
+//                organizer.toOrganizerEntity(),
+//                EventStatus.UPCOMING,
+//                Category.fromName(name),
+//                name,
+//                description,
+//                eventStartDate,
+//                eventEndDate,
+//                createDate,
+//                modifyDate
+//        );
+//    }
 }

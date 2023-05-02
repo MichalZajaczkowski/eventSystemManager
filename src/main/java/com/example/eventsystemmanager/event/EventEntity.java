@@ -1,6 +1,6 @@
 package com.example.eventsystemmanager.event;
 
-import com.example.eventsystemmanager.category.CategoryEntity;
+import com.example.eventsystemmanager.category.Category;
 import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.organizer.OrganizerEntity;
 import com.example.eventsystemmanager.place.PlaceEntity;
@@ -16,8 +16,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
+@Builder
 @Entity
-@Table(name = "eventss")
+@Table(name = "events")
 public class EventEntity {
 
     @Id
@@ -36,9 +37,9 @@ public class EventEntity {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "category_id")
-    private CategoryEntity category;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private Category category;
 
     @Column(name = "name")
     private String name;
@@ -54,11 +55,12 @@ public class EventEntity {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventEndDate;
 
-    @Column(name = "date of creat")
+    @Column(name = "date_of_creat")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDate;
 
-    @Column(name = "date of modification")
+    @Column(name = "date_of_modification")
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyDate;
 }
+// TODO: 02.05.2023 rozbicie dat na daty i czas osobno
