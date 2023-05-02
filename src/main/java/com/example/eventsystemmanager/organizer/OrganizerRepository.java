@@ -21,5 +21,9 @@ public interface OrganizerRepository extends JpaRepository<OrganizerEntity, Long
     void deleteAll();
     @Query("SELECT u FROM OrganizerEntity u WHERE u.name = :name")
     Optional<OrganizerEntity> findByName(String name);
+
+    @Query("SELECT u FROM OrganizerEntity u WHERE u.name = :name")
+    OrganizerEntity findOrgByName(String name);
+
     Optional<Object> findById(SingularAttribute<AbstractPersistable, Serializable> id);
 }
