@@ -48,8 +48,7 @@ public class CategoryService {
     public void updateCategory(CategoryDto categoryDto) {
         category(categoryDto);
     }
-
-    private void category(CategoryDto categoryDto) {
+    public CategoryDto category(CategoryDto categoryDto) {
         if (categoryRepository.findByDescription(categoryDto.getDescription()).isPresent()) {
             log.info("Log: Category with description '" + categoryDto.getDescription() + "' already exists");
             throw new NonUniqueResultException("Category with description '" + categoryDto.getDescription() + "' already exists");
@@ -59,6 +58,7 @@ public class CategoryService {
             throw new IllegalArgumentException(CATEGORYWITHIDSTATEMENT);
         }
         categoryRepository.save(categoryDto.toCategory());
+        return categoryDto;
     }
 
 }
