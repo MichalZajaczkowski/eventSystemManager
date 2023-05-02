@@ -9,7 +9,6 @@ import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,12 +16,12 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @ToString
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlaceDto {
 
     @NotBlank
     private Long id;
-    @NotNull
     @Valid
     private AddressDto placeAddress;
     @NotBlank
@@ -47,14 +46,29 @@ public class PlaceDto {
         this.placeAddress = new AddressDto(addressEntity);
     }
 
+
+//    public PlaceEntity toPlaceEntity() {
+//        return new PlaceEntity(
+//                id,
+//                placeAddress.toAddressEntity(),
+//                name,
+//                shortName,
+//                description,
+//                quantityAvailablePlaces
+//        );
+//    }
+
+
     public PlaceEntity toPlaceEntity() {
-        return new PlaceEntity(
-                id,
-                placeAddress.toAddressEntity(),
-                name,
-                shortName,
-                description,
-                quantityAvailablePlaces
-        );
+        PlaceEntity placeEntity = new PlaceEntity();
+        placeEntity.setId(this.id);
+        placeEntity.setName(this.name);
+        placeEntity.setShortName(this.shortName);
+        placeEntity.setDescription(this.description);
+        placeEntity.setQuantityAvailablePlaces(this.quantityAvailablePlaces);
+        if (this.placeAddress != null) {
+            placeEntity.setPlaceAddressEntity(this.placeAddress.toAddressEntity());
+        }
+        return placeEntity;
     }
 }
