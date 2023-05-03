@@ -1,19 +1,30 @@
 package com.example.eventsystemmanager.event;
 
-import com.example.eventsystemmanager.address.AddressMapper;
-import com.example.eventsystemmanager.address.AddressRepository;
-import com.example.eventsystemmanager.category.CategoryRepository;
-import com.example.eventsystemmanager.category.CategoryService;
 import com.example.eventsystemmanager.event.eventStatus.EventStatus;
-import com.example.eventsystemmanager.organizer.*;
-import com.example.eventsystemmanager.place.*;
+import com.example.eventsystemmanager.exception.EventSaveException;
+import com.example.eventsystemmanager.exception.OrganizerNotFoundException;
+import com.example.eventsystemmanager.exception.PlaceNotFoundException;
+import com.example.eventsystemmanager.organizer.OrganizerDto;
+import com.example.eventsystemmanager.organizer.OrganizerEntity;
+import com.example.eventsystemmanager.organizer.OrganizerRepository;
+import com.example.eventsystemmanager.organizer.OrganizerService;
+import com.example.eventsystemmanager.place.PlaceDto;
+import com.example.eventsystemmanager.place.PlaceEntity;
+import com.example.eventsystemmanager.place.PlaceRepository;
+import com.example.eventsystemmanager.place.PlaceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class EventService {
 
@@ -35,8 +46,10 @@ public class EventService {
                 .map(this::mapEventToDto)
                 .orElseThrow(() -> new IllegalArgumentException("komunikat do napisania "));
     }
-    public EventDto createEvent(EventDto eventDto) {
+    @Transactional
+    public EventDto createEvent(@NotNull @Valid EventDto eventDto) {
         EventEntity eventEntity = eventMapper.toEntity(eventDto);
+
         try {
             if (eventDto.getOrganizer() != null) {
                 OrganizerEntity organizerEntity = organizerRepository.findOrgByName(eventDto.getOrganizer().getName());
@@ -46,9 +59,9 @@ public class EventService {
                 }
                 eventEntity.setOrganizer(organizerEntity);
             }
-        } catch (Exception e) {
-            System.out.println("Error while creating organizer: " + e.getMessage());
-            return null;
+        } catch (OrganizerNotFoundException e) {
+            log.error("Organizer not found: {}", e.getMessage());
+            throw e;
         }
 
         try {
@@ -60,20 +73,20 @@ public class EventService {
                 }
                 eventEntity.setPlace(placeEntity);
             }
-        } catch (Exception e) {
-            System.out.println("Error while creating place: " + e.getMessage());
-            return null;
+        } catch (PlaceNotFoundException e) {
+            log.error("Place not found: {}", e.getMessage());
+            throw e;
         }
+
         eventEntity.setEventStatus(EventStatus.UPCOMING);
         eventEntity.setCreateDate(LocalDateTime.now());
-        eventEntity.setModifyDate(LocalDateTime.now());
 
         try {
             EventEntity savedEvent = eventRepository.save(eventEntity);
             return eventMapper.toDto(savedEvent);
         } catch (Exception e) {
-            System.out.println("Error while saving event: " + e.getMessage());
-            return null;
+            log.error("Error while saving event: {}", e.getMessage());
+            throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
         }
     }
 
