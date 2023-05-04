@@ -16,10 +16,15 @@ public class CategoryDto {
     @NotBlank
     private String description;
 
+    public CategoryDto(CategoryEntity categoryEntity) {
+        this.id = categoryEntity.getId();
+        this.description = categoryEntity.getDescription();
+    }
+
     public CategoryEntity toCategory() {
-        CategoryEntity category = new CategoryEntity();
-        category.setId(id);// tu musi iść id
-        category.setDescription(description);
-        return category;
+        return new CategoryEntity(
+                id,
+                description
+        );
     }
 }

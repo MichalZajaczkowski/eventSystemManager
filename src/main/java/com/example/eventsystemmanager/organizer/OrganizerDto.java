@@ -23,11 +23,17 @@ public class OrganizerDto {
     @Schema(description = "Organizer description", example = "KopYTkO", required = true)
     private String description;
 
-    public OrganizerEntity toOrganizer() {
-        OrganizerEntity organizer = new OrganizerEntity();
-        organizer.setId(id);
-        organizer.setName(name);
-        organizer.setDescription(description);
-        return organizer;
+    public OrganizerDto(OrganizerEntity organizerEntity) {
+        this.id = organizerEntity.getId();
+        this.name = organizerEntity.getName();
+        this.description = organizerEntity.getDescription();
+    }
+
+    public OrganizerEntity toOrganizerEntity() {
+        return new OrganizerEntity(
+                id,
+                name,
+                description
+        );
     }
 }

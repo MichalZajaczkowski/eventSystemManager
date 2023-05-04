@@ -1,10 +1,7 @@
 package com.example.eventsystemmanager.organizer;
 
-import com.example.eventsystemmanager.organizer.OrganizerDto;
-import com.example.eventsystemmanager.organizer.OrganizerEntity;
+import com.example.eventsystemmanager.category.CategoryDto;
 import com.example.eventsystemmanager.exception.OrganizerNotFoundException;
-import com.example.eventsystemmanager.organizer.OrganizerMapper;
-import com.example.eventsystemmanager.organizer.OrganizerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,16 +62,18 @@ public class OrganizerService {
                 .build();
     }
 
-    public void createOrganizer(OrganizerDto organizerDto) {
-        if (organizerRepository.findById(id).isPresent()) {
-            log.info("Log: " + ORGANIZERWITHIDALREADYEXIST);
-            throw new IllegalStateException(ORGANIZERWITHIDALREADYEXIST);
-        }
+    public OrganizerDto createOrganizer(OrganizerDto organizerDto) {
+        OrganizerEntity organizerEntity = organizerDto.toOrganizerEntity();
+
         if (organizerRepository.findByName(organizerDto.getName()).isPresent()) {
             log.info("Log: " + ORGANIZERWITHNAMEDOEALREADYEXIST);
-            throw new IllegalStateException(ORGANIZERWITHNAMEDOEALREADYEXIST);
+            throw new IllegalArgumentException("Organizer with name '" + organizerDto.getName() + "' already exists");
         }
-        organizerRepository.save(organizerDto.toOrganizer());
+
+        organizerRepository.save(organizerEntity);
+        organizerDto.setId(organizerEntity.getId()); // update DTO with generated ID
+
+        return organizerDto;
     }
 
     public void updateOrganizer(OrganizerDto organizerDto) {
@@ -90,7 +89,7 @@ public class OrganizerService {
         if (organizerDto.getDescription() != null) {
             organizerDto.setDescription(organizerDto.getDescription());
         }
-        organizerRepository.save(organizerDto.toOrganizer());
+        organizerRepository.save(organizerDto.toOrganizerEntity());
     }
 
     public void partialUpdate(OrganizerDto organizerDto) {
