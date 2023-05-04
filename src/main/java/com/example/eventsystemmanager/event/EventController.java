@@ -1,14 +1,14 @@
 package com.example.eventsystemmanager.event;
 
+import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.place.PlaceDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 
 @RestController
@@ -27,6 +27,27 @@ public class EventController {
     public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
         EventDto createdEvent = eventService.createEvent(eventDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
+    }
+
+    @PatchMapping("/{eventId}/modifyEvent")
+    public ResponseEntity<EventDto> modifyEvent(@PathVariable Long eventId, @RequestBody EventDto eventDto) {
+        eventDto.setId(eventId);
+        EventDto updatedEvent = eventService.partialUpdateEventsData(eventId, eventDto);
+        log.debug("Log: Event was updated");
+        return new ResponseEntity<>(updatedEvent, HttpStatus.ACCEPTED);
+    }
+    @PatchMapping("/{eventId}/updatePlace")
+    public ResponseEntity<EventDto> updatePlace(@PathVariable Long eventId, @RequestBody PlaceDto placeId) {
+        EventDto updatedEvent = eventService.updatePlaceForEvent(eventId, placeId);
+        return ResponseEntity.ok(updatedEvent);
+    }
+
+
+
+    @PatchMapping("/{eventId}/updateOrganizer")
+    public ResponseEntity<EventDto> updateOrganizer(@PathVariable Long eventId, @RequestBody OrganizerDto organizerId) {
+        EventDto updatedEvent = eventService.updateOrganizerForEvent(eventId, organizerId);
+        return ResponseEntity.ok(updatedEvent);
     }
 
 //    @GetMapping("/{id}")
