@@ -17,23 +17,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class EventService {
-
+    private static final String PLACE_WITH_ID_DOES_NOT_EXIST = "Place with id " + id + " does not exist.";
+    private static final String ORGANIZER_WITH_ID_DOES_NOT_EXIST = "Organizer with id " + id + " does not exist.";
+    private static final String EVENT_WITH_ID_DOES_NOT_EXIST = "Event with id " + id + " does not exist.";
     private final EventRepository eventRepository;
     private final OrganizerRepository organizerRepository;
     private final PlaceRepository placeRepository;
     private final OrganizerService organizerService;
     private final PlaceService placeService;
     private final EventMapper eventMapper;
+
     public List<EventDto> findAll() {
         return eventRepository.findAll()
                 .stream()
@@ -46,6 +50,7 @@ public class EventService {
                 .map(this::mapEventToDto)
                 .orElseThrow(() -> new IllegalArgumentException("komunikat do napisania "));
     }
+
     @Transactional
     public EventDto createEvent(@NotNull @Valid EventDto eventDto) {
         EventEntity eventEntity = eventMapper.toEntity(eventDto);
@@ -89,6 +94,68 @@ public class EventService {
             throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
         }
     }
+
+    public EventDto partialUpdateEventsData(Long eventId, EventDto eventDto) {
+        EventEntity eventToUpdate = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalStateException(EVENT_WITH_ID_DOES_NOT_EXIST));
+
+        if (eventDto.getCategory() != null) {
+            eventToUpdate.setCategory(eventDto.getCategory());
+        }
+        if (eventDto.getName() != null) {
+            eventToUpdate.setName(eventDto.getName());
+        }
+        if (eventDto.getDescription() != null) {
+            eventToUpdate.setDescription(eventDto.getDescription());
+        }
+        if (eventDto.getEventStartDate() != null) {
+            eventToUpdate.setEventStartDate(eventDto.getEventStartDate());
+        }
+        if (eventDto.getEventEndDate() != null) {
+            eventToUpdate.setEventEndDate(eventDto.getEventEndDate());
+        }
+        eventToUpdate.setModifyDate(LocalDateTime.now());
+        eventRepository.save(eventToUpdate);
+        return eventDto;
+    }
+
+    public EventDto updatePlaceForEvent(Long eventId, PlaceDto placeId) {
+        EventEntity eventToUpdate = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException(EVENT_WITH_ID_DOES_NOT_EXIST));
+
+        // Jeśli miejsce nie zostanie zmienione, to nie wykonujemy żadnych akcji
+        if (placeId.equals(eventToUpdate.getPlace().getId())) {
+            return eventMapper.toDto(eventToUpdate);
+        }
+        // Pobierz miejsce, które chcemy przypisać do wydarzenia
+        PlaceEntity placeToUpdate = placeRepository.findById(placeId.getId())
+                .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
+        // Ustaw zmodyfikowaną wartość miejsca w wydarzeniu
+        eventToUpdate.setPlace(placeToUpdate);
+        eventToUpdate.setModifyDate(LocalDateTime.now()); // ustawiamy pole modifyDate
+
+        EventEntity updatedEvent = eventRepository.save(eventToUpdate);
+        return eventMapper.toDto(updatedEvent);
+    }
+    public EventDto updateOrganizerForEvent(Long eventId, OrganizerDto organizerId) {
+        EventEntity eventToUpdate = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalStateException(EVENT_WITH_ID_DOES_NOT_EXIST));
+        // Jeśli organizator nie zostanie zmienione, to nie wykonujemy żadnych akcji
+        if (organizerId.equals(eventToUpdate.getOrganizer().getId())) {
+            return eventMapper.toDto(eventToUpdate);
+        }
+        // Pobierz organizatora, którego chcemy przypisać do wydarzenia
+
+        OrganizerEntity organizerToUpdate = organizerRepository.findById(organizerId.getId())
+                .orElseThrow(() -> new IllegalStateException(ORGANIZER_WITH_ID_DOES_NOT_EXIST));
+
+        // Ustaw zmodyfikowaną wartość organizatora w wydarzeniu
+        eventToUpdate.setOrganizer(organizerToUpdate);
+        eventToUpdate.setModifyDate(LocalDateTime.now()); // ustawienie pola modifyDate
+        EventEntity updatedEvent = eventRepository.save(eventToUpdate);
+        return eventMapper.toDto(updatedEvent);
+    }
+
 
     private EventDto mapEventToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
