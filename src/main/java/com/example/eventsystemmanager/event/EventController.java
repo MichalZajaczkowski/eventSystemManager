@@ -1,5 +1,6 @@
 package com.example.eventsystemmanager.event;
 
+import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.place.PlaceDto;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -50,40 +52,27 @@ public class EventController {
         return ResponseEntity.ok(updatedEvent);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<EventEntity> getEventById(@PathVariable Long id) {
-//        try {
-//            EventEntity event = eventService.getEventById(id);
-//            return ResponseEntity.ok(event);
-//        } catch (EventNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    @GetMapping
-//    public ResponseEntity<List<EventEntity>> getAllEvents() {
-//        List<EventEntity> events = eventService.getAllEvents();
-//        return ResponseEntity.ok(events);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteEventById(@PathVariable Long id) {
-//        try {
-//            eventService.deleteEventById(id);
-//            return ResponseEntity.noContent().build();
-//        } catch (EventNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<EventEntity> updateEvent(@PathVariable Long id, @RequestBody UpdateEventRequest request) {
-//        try {
-//            EventEntity updatedEvent = eventService.updateEvent(id, request);
-//            return ResponseEntity.ok(updatedEvent);
-//        } catch (EventNotFoundException | PlaceNotFoundException | AddressNotFoundException e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @GetMapping
+    public ResponseEntity<List<EventDto>> findAllEvents() {
+        List<EventDto> events = eventService.findAllEvents();
+        if (events.isEmpty()) {
+            log.error("Event not found");
+            return ResponseEntity.noContent().build();
+        } else {
+            log.debug("Event found");
+            return ResponseEntity.ok(events);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDto> getEventById(@PathVariable Long id) throws EventNotFoundException {
+        try {
+            EventDto event = eventService.findById(id);
+            return ResponseEntity.ok(event);
+        } catch (NoSuchElementException e) {
+            throw new EventNotFoundException("Event with id " + id + " not found.");
+        }
+    }
+
 }
 
