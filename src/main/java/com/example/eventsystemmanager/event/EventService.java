@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.event;
 
 import com.example.eventsystemmanager.event.eventStatus.EventStatus;
+import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.exception.EventSaveException;
 import com.example.eventsystemmanager.exception.OrganizerNotFoundException;
 import com.example.eventsystemmanager.exception.PlaceNotFoundException;
@@ -21,6 +22,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -45,10 +47,17 @@ public class EventService {
                 .toList();
     }
 
-    public EventDto findById(Long id) {
+    public List<EventDto> findAllEvents() {
+        return eventRepository.findAll()
+                .stream()
+                .map(this::mapEventToDto)
+                .toList();
+    }
+
+    public EventDto findById(Long id) throws EventNotFoundException {
         return eventRepository.findById(id)
                 .map(this::mapEventToDto)
-                .orElseThrow(() -> new IllegalArgumentException("komunikat do napisania "));
+                .orElseThrow(() -> new EventNotFoundException("No such event"));
     }
 
     @Transactional
@@ -155,8 +164,6 @@ public class EventService {
         EventEntity updatedEvent = eventRepository.save(eventToUpdate);
         return eventMapper.toDto(updatedEvent);
     }
-
-
     private EventDto mapEventToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
         eventDto.setId(eventEntity.getId());
