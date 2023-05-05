@@ -36,4 +36,10 @@ public class AdditionalController {
         Integer eventsCount = additionalService.getEventsCountByOrganizerName(name);
         return ResponseEntity.ok(eventsCount);
     }
+
+    @GetMapping("/places/{placeName}/events-count")
+    public ResponseEntity<Integer> getEventsCountByPlaceName(@PathVariable String placeName) {
+        Integer eventsCount = Math.toIntExact(additionalService.getEventsCountByPlaceName(placeName));
+        return ResponseEntity.ok(eventsCount);
+    }
 }

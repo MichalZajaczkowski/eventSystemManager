@@ -24,5 +24,8 @@ public interface AdditionalRepository extends JpaRepository<EventEntity, Long> {
     @Query("SELECT COUNT(e) FROM EventEntity e WHERE e.organizer = :organizer")
     Integer countByOrganizer(@Param("organizer") OrganizerEntity organizer);
 
+    @Query("SELECT e FROM EventEntity e JOIN e.place p WHERE p.name = :placeName")
+    List<EventEntity> findByPlaceName(@Param("placeName") String placeName);
+
 
 }

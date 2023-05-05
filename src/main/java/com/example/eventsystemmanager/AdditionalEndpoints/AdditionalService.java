@@ -5,9 +5,12 @@ import com.example.eventsystemmanager.event.EventEntity;
 import com.example.eventsystemmanager.event.EventMapper;
 import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.exception.OrganizerNotFoundException;
+import com.example.eventsystemmanager.exception.PlaceNotFoundException;
 import com.example.eventsystemmanager.organizer.OrganizerEntity;
 import com.example.eventsystemmanager.organizer.OrganizerRepository;
+import com.example.eventsystemmanager.place.PlaceEntity;
 import com.example.eventsystemmanager.place.PlaceMapper;
+import com.example.eventsystemmanager.place.PlaceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,11 +22,15 @@ public class AdditionalService {
     private final OrganizerRepository organizerRepository;
     private final EventMapper eventMapper;
     private final PlaceMapper placeMapper;
-    public AdditionalService(AdditionalRepository additionalRepository, OrganizerRepository organizerRepository, EventMapper eventMapper, PlaceMapper placeMapper) {
+    private final PlaceRepository placeRepository;
+
+    public AdditionalService(AdditionalRepository additionalRepository, OrganizerRepository organizerRepository, EventMapper eventMapper, PlaceMapper placeMapper,
+                             PlaceRepository placeRepository) {
         this.additionalRepository = additionalRepository;
         this.organizerRepository = organizerRepository;
         this.eventMapper = eventMapper;
         this.placeMapper = placeMapper;
+        this.placeRepository = placeRepository;
     }
 
     public List<EventDto> searchEventsByOrganizerNameOrPlaceName(String organizerName, String placeName) throws EventNotFoundException {
@@ -47,5 +54,14 @@ public class AdditionalService {
                 .orElseThrow(() -> new OrganizerNotFoundException("Organizer with name " + name + " not found"));
         return additionalRepository.countByOrganizer(organizer);
     }
+
+    public long getEventsCountByPlaceName(String placeName) throws PlaceNotFoundException {
+        List<EventEntity> events = additionalRepository.findByPlaceName(placeName);
+        if (events.isEmpty()) {
+            throw new PlaceNotFoundException("No events found for the given place name");
+        }
+        return events.size();
+    }
+
 }
 
