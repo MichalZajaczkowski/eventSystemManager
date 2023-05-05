@@ -16,4 +16,10 @@ public interface AdditionalRepository extends JpaRepository<EventEntity, Long> {
     @Query("SELECT DISTINCT e.place FROM EventEntity e WHERE e.organizer.id = :organizerId")
     List<PlaceEntity> findPlacesByOrganizerId(@Param("organizerId") Long organizerId);
 
+
+    @Query("SELECT DISTINCT p.name FROM EventEntity e JOIN e.place p JOIN e.organizer o WHERE o.name = :organizerName")
+    List<String> findPlacesByOrganizerName(@Param("organizerName") String organizerName);
+
+
+
 }
