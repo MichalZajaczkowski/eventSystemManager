@@ -1,8 +1,10 @@
 package com.example.eventsystemmanager.AdditionalEndpoints;
 
+import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.event.EventDto;
 import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.exception.OrganizerNotFoundException;
+import com.example.eventsystemmanager.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -42,4 +44,31 @@ public class AdditionalController {
         Integer eventsCount = Math.toIntExact(additionalService.getEventsCountByPlaceName(placeName));
         return ResponseEntity.ok(eventsCount);
     }
+
+    @GetMapping("/address/{addressId}/users")
+    public List<UserDto> getUsersByAddressId(@PathVariable Long addressId) {
+        return additionalService.getUsersByAddressId(addressId);
+    }
+
+    @GetMapping("/address/{addressId}")
+    public AddressDto getAddressById(@PathVariable Long addressId) {
+        return additionalService.getAddressById(addressId);
+    }
+
+    @GetMapping("/users/user-address")
+    public List<UserDto> getUsersByUserAddress() {
+        return additionalService.getUsersByUserAddress();
+    }
+
+    @GetMapping("/users-with-same-address")
+    public ResponseEntity<List<AddressUsersDto>> getUsersWithSameAddress() {
+        List<AddressUsersDto> addressUsers = additionalService.getAddressUsers();
+        if (addressUsers.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(addressUsers);
+    }
+
+
+
 }
