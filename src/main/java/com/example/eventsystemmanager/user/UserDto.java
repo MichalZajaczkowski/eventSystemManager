@@ -38,6 +38,12 @@ public class UserDto {
     private UserStatus userStatus;
     private AddressType addressType;
 
+    public UserDto(Long id, String userName, String userSurname) {
+        this.id = id;
+        this.userName = userName;
+        this.userSurname = userSurname;
+    }
+
 
     public UserEntity toUserEntity() {
         return new UserEntity(
