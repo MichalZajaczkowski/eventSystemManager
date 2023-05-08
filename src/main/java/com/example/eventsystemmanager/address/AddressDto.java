@@ -49,6 +49,13 @@ public class AddressDto {
         this.id = id;
     }
 
+    public AddressDto(Long id, String street, String city, String country) {
+        this.id = id;
+        this.street = street;
+        this.city = city;
+        this.country = country;
+    }
+
     public AddressEntity toAddressEntity() {
         return new AddressEntity(
                 id,
