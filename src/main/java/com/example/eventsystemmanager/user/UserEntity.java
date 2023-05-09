@@ -45,8 +45,11 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-//    @Enumerated(EnumType.STRING)
-//    private AddressType addressType;
+    public UserEntity(String userName, String userSurname) {
+        this.userName = userName;
+        this.userSurname = userSurname;
+        // set other fields to default values
+    }
 
     public Long getUserAddressEntityId() {
         return addressEntity.getId();

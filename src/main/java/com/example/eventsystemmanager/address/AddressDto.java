@@ -8,6 +8,7 @@ import lombok.*;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -34,8 +35,13 @@ public class AddressDto {
     private Integer postCode;
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public AddressDto(AddressEntity addressEntity) {
+        if (addressEntity == null) {
+            throw new IllegalArgumentException("AddressEntity cannot be null");
+        }
         this.id = addressEntity.getId();
         this.country = addressEntity.getCountry();
         this.city = addressEntity.getCity();
@@ -43,6 +49,9 @@ public class AddressDto {
         this.buildingNumber = addressEntity.getBuildingNumber();
         this.localNumber = addressEntity.getLocalNumber();
         this.postCode = addressEntity.getPostCode();
+        this.addressType = addressEntity.getAddressType();
+        this.createdDate = addressEntity.getCreatedDate();
+        this.modifiedDate = addressEntity.getModifiedDate();
     }
 
     public AddressDto(Long id) {
@@ -65,7 +74,9 @@ public class AddressDto {
                 buildingNumber,
                 localNumber,
                 postCode,
-                addressType
+                addressType,
+                createdDate,
+                modifiedDate
         );
     }
 }

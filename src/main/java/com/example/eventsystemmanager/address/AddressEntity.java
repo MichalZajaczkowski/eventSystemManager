@@ -4,6 +4,7 @@ import com.example.eventsystemmanager.address.addressType.AddressType;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +42,12 @@ public class AddressEntity {
     @Column(name = "address_type")
     private AddressType addressType;
 
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
+
     public void updateFieldsFromDto(AddressDto dto) {
         if (dto.getCountry() != null) {
             this.setCountry(dto.getCountry());
@@ -61,5 +68,15 @@ public class AddressEntity {
             this.setPostCode(dto.getPostCode());
         }
     }
+
+    @PrePersist
+    public void onCreate() {
+        createdDate = LocalDateTime.now();
+        modifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifiedDate = LocalDateTime.now();
+    }
 }
-// TODO: 29.04.2023 add date of creat and mod address

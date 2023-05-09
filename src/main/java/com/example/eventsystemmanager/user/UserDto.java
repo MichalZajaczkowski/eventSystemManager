@@ -44,6 +44,10 @@ public class UserDto {
         this.userSurname = userSurname;
     }
 
+    public UserDto(long l, long l1, String john, String doe, String mail, String number, UserStatus userStatus) {
+
+    }
+
 
     public UserEntity toUserEntity() {
         return new UserEntity(
