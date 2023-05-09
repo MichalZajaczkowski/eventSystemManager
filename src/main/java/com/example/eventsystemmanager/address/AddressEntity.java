@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.address;
 
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
@@ -43,9 +44,11 @@ public class AddressEntity {
     private AddressType addressType;
 
     @Column(name = "created_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 
     @Column(name = "modified_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifiedDate;
 
     public void updateFieldsFromDto(AddressDto dto) {

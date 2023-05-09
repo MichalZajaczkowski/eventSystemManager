@@ -1,10 +1,13 @@
 package com.example.eventsystemmanager.address;
 
+import com.example.eventsystemmanager.exception.AddressCreationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -31,6 +34,9 @@ public class AddressService {
                 .buildingNumber(addressEntity.getBuildingNumber())
                 .localNumber(addressEntity.getLocalNumber())
                 .postCode(addressEntity.getPostCode())
+                .addressType(addressEntity.getAddressType())
+                .createdDate(addressEntity.getCreatedDate())
+                .modifiedDate(addressEntity.getModifiedDate())
                 .build();
 
     }
@@ -38,52 +44,58 @@ public class AddressService {
     public AddressDto findById(Long id) {
         return addressRepository.findById(id)
                 .map(addressMapper::addressMapToDto)
-                .orElseThrow(() -> new IllegalArgumentException("UserAddress with id " + id + " does not exist."));
+                .orElseThrow(() -> new IllegalArgumentException("Address with id " + id + " does not exist."));
     }
 
-    public void createUserAddress(AddressDto addressDto) {
-        if (addressRepository.findById(id).isPresent()) {
-            throw new IllegalArgumentException("UserAddress with id " + id + " already exists");
-        } else {
-            addressRepository.save(addressDto.toAddressEntity());
+    public void createAddress(AddressDto addressDto) {
+        AddressEntity addressEntity = addressDto.toAddressEntity();
+
+        AddressEntity savedAddressEntity = addressRepository.save(addressEntity);
+        if (savedAddressEntity == null || savedAddressEntity.getId() == null) {
+            throw new AddressCreationException("Address could not be created");
         }
+
+        addressDto.setId(savedAddressEntity.getId());
     }
 
-    public void updateUserAddress(AddressDto addressDto) {
-        AddressEntity addressEntity = addressRepository.findById(addressDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("UserAddress with id" + addressDto.getId() + "does not exist"));
-        addressEntity.setCountry(addressDto.getCountry());
-        addressEntity.setCity(addressDto.getCity());
-        addressEntity.setStreet(addressDto.getStreet());
-        addressEntity.setBuildingNumber(addressDto.getBuildingNumber());
-        addressEntity.setLocalNumber(addressDto.getLocalNumber());
-        addressEntity.setPostCode(addressDto.getPostCode());
-        addressMapper.addressMapToDto(addressRepository.save(addressEntity));
-    }
+    public Map<String, Object> partialUpdateAddress(Long id, AddressDto addressDto) {
+        AddressEntity addressEntity = addressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Address with id " + id + " does not exist"));
+        Map<String, Object> changedFields = new HashMap<>();
 
-    public void partialUpdateUserAddress(AddressDto addressDto) {
-        AddressEntity addressEntity = addressRepository.findById(addressDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("UserAddress with id" + addressDto.getId() + "does not exist"));
         if (addressDto.getCountry() != null) {
             addressEntity.setCountry(addressDto.getCountry());
+            changedFields.put("country", addressDto.getCountry());
         }
         if (addressDto.getCity() != null) {
             addressEntity.setCity(addressDto.getCity());
+            changedFields.put("city", addressDto.getCity());
         }
         if (addressDto.getStreet() != null) {
             addressEntity.setStreet(addressDto.getStreet());
+            changedFields.put("street", addressDto.getStreet());
         }
         if (addressDto.getBuildingNumber() != null) {
             addressEntity.setBuildingNumber(addressDto.getBuildingNumber());
+            changedFields.put("buildingNumber", addressDto.getBuildingNumber());
         }
         if (addressDto.getLocalNumber() != null) {
             addressEntity.setLocalNumber(addressDto.getLocalNumber());
+            changedFields.put("localNumber", addressDto.getLocalNumber());
         }
         if (addressDto.getPostCode() != null) {
             addressEntity.setPostCode(addressDto.getPostCode());
+            changedFields.put("postCode", addressDto.getPostCode());
         }
+        if (addressDto.getAddressType() != null) {
+            addressEntity.setAddressType(addressDto.getAddressType());
+            changedFields.put("addressType", addressDto.getAddressType());
+        }
+
         addressRepository.save(addressEntity);
+        return changedFields;
     }
+
 
     public void removeAddress(Long id) {
         AddressEntity addressEntity = addressRepository.findById(id)

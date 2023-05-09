@@ -1,13 +1,14 @@
 package com.example.eventsystemmanager.address;
 
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,27 +16,47 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AddressDto {
 
-    @NotBlank
     @JsonIgnore
     private Long id;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String country;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String city;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String street;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer buildingNumber;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer localNumber;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer postCode;
+
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifiedDate;
 
     public AddressDto(AddressEntity addressEntity) {

@@ -1,5 +1,7 @@
 package com.example.eventsystemmanager.address;
 
+import com.example.eventsystemmanager.exception.AddressCreationException;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,26 +12,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping("/userAddress")
+@RequestMapping("/api/v1/address")
 public class AddressController {
-    private final AddressRepository addressRepository;
     private final AddressService addressService;
 
     @GetMapping()
     public ResponseEntity<List<AddressDto>> getUsersAddress() {
-        List<AddressDto> usersAddressDtoList = addressService.findAll();
-        if (usersAddressDtoList.isEmpty()) {
+        List<AddressDto> addressDtoList = addressService.findAll();
+        if (addressDtoList.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            log.info("UsersAddress returned: " + addressService.findAll());
-            return ResponseEntity.ok(usersAddressDtoList);
+            log.info("Address returned: " + addressDtoList.stream().toList());
+            return ResponseEntity.ok(addressDtoList);
         }
     }
 
@@ -42,36 +48,37 @@ public class AddressController {
     @GetMapping("/{id}")
     public ResponseEntity<AddressDto> getUsersAddressById(@Parameter(description = "userAddress to be saved") @PathVariable Long id) {
         AddressDto addressDto = addressService.findById(id);
-        log.info("User address found: " + addressService.findById(id));
-        return addressDto != null ? new ResponseEntity<>(HttpStatus.OK) : ResponseEntity.notFound().build();
-    }
-//    @GetMapping("/{id}")
-//    public ResponseEntity getPublisher(@PathVariable Long id) {
-//        UserAddressDto userAddressDto = userAddressService.findById(id);
-//        userAddressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User address witch id" + userAddressDto.getId() + " not found"));
-//        log.info("Found userAddress: " + userAddressRepository.getById(id));
-//        return ResponseEntity.ok("Found userAddress: " + userAddressRepository.getById(id));
-//    }
-
-    @PostMapping()
-    public ResponseEntity<AddressDto> save(@RequestBody AddressDto addressDto) {
-        addressService.createUserAddress(addressDto);
-        log.info("User address was created");
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        log.info("Address found: " + addressDto.toString());
+        return addressDto != null ? new ResponseEntity<>(addressDto, HttpStatus.OK) : ResponseEntity.notFound().build();
     }
 
-    @PutMapping
-    public ResponseEntity<AddressDto> update(@RequestBody AddressDto addressDto) {
-        addressService.updateUserAddress(addressDto);
-        log.info("User address was updated");
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    @PostMapping("/create")
+    public ResponseEntity<AddressDto> save(@Valid @RequestBody AddressDto addressDto) {
+        try {
+            addressService.createAddress(addressDto);
+            log.info("Address was created");
+            return new ResponseEntity<>(addressDto, HttpStatus.CREATED);
+        } catch (AddressCreationException ex) {
+            log.error("Address could not be created: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
-    @PatchMapping
-    public ResponseEntity<AddressDto> partialUpdateUserAddress(@RequestBody AddressDto addressDto) {
-        addressService.partialUpdateUserAddress(addressDto);
-        log.info("User address was updated");
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @PatchMapping("/{addressId}/address")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<Map<String, Object>> partialUpdateUserAddress(@PathVariable Long addressId, @RequestBody AddressDto addressDto) {
+        Map<String, Object> changedFields = addressService.partialUpdateAddress(addressId, addressDto);
+        log.info("Address was updated to " + changedFields);
+        return new ResponseEntity<>(changedFields, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
