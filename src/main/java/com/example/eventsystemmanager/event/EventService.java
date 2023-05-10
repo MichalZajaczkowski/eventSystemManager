@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -93,7 +94,7 @@ public class EventService {
         }
 
         eventEntity.setEventStatus(EventStatus.UPCOMING);
-        eventEntity.setCreateDate(LocalDateTime.now());
+        eventEntity.setCreatedDate(LocalDateTime.now());
 
         try {
             EventEntity savedEvent = eventRepository.save(eventEntity);
@@ -103,6 +104,52 @@ public class EventService {
             throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
         }
     }
+
+    @Transactional
+    public EventDto createEventByOrganizer(@NotNull @Valid EventDto eventDto, Long organizerId, String organizerName) {
+        EventEntity eventEntity = eventMapper.toEntity(eventDto);
+
+        try {
+            OrganizerEntity organizerEntity = null;
+            if (organizerId != null) {
+                organizerEntity = organizerRepository.findById(organizerId).orElseThrow(() ->
+                        new OrganizerNotFoundException("Organizer with id " + organizerId + " does not exist"));
+            } else if (organizerName != null) {
+                organizerEntity = organizerRepository.findByName(organizerName).orElseThrow(() ->
+                        new OrganizerNotFoundException("Organizer with name " + organizerName + " does not exist"));
+            }
+            eventEntity.setOrganizer(organizerEntity);
+        } catch (OrganizerNotFoundException e) {
+            log.error("Organizer not found: {}", e.getMessage());
+            throw e;
+        }
+
+        try {
+            if (eventDto.getPlace() != null) {
+                PlaceEntity placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
+                if (placeEntity == null) {
+                    PlaceDto placeDto = placeService.createPlace(eventDto.getPlace());
+                    placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
+                }
+                eventEntity.setPlace(placeEntity);
+            }
+        } catch (PlaceNotFoundException e) {
+            log.error("Place not found: {}", e.getMessage());
+            throw e;
+        }
+
+        eventEntity.setEventStatus(EventStatus.UPCOMING);
+        eventEntity.setCreatedDate(LocalDateTime.now());
+
+        try {
+            EventEntity savedEvent = eventRepository.save(eventEntity);
+            return eventMapper.toDto(savedEvent);
+        } catch (Exception e) {
+            log.error("Error while saving event: {}", e.getMessage());
+            throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
+        }
+    }
+
 
     public EventDto partialUpdateEventsData(Long eventId, EventDto eventDto) {
         EventEntity eventToUpdate = eventRepository.findById(eventId)
@@ -123,7 +170,7 @@ public class EventService {
         if (eventDto.getEventEndDate() != null) {
             eventToUpdate.setEventEndDate(eventDto.getEventEndDate());
         }
-        eventToUpdate.setModifyDate(LocalDateTime.now());
+        eventToUpdate.setModifiedDate(LocalDateTime.now());
         eventRepository.save(eventToUpdate);
         return eventDto;
     }
@@ -141,7 +188,7 @@ public class EventService {
                 .orElseThrow(() -> new IllegalArgumentException(PLACE_WITH_ID_DOES_NOT_EXIST));
         // Ustaw zmodyfikowaną wartość miejsca w wydarzeniu
         eventToUpdate.setPlace(placeToUpdate);
-        eventToUpdate.setModifyDate(LocalDateTime.now()); // ustawiamy pole modifyDate
+        eventToUpdate.setModifiedDate(LocalDateTime.now()); // ustawiamy pole modifyDate
 
         EventEntity updatedEvent = eventRepository.save(eventToUpdate);
         return eventMapper.toDto(updatedEvent);
@@ -160,9 +207,35 @@ public class EventService {
 
         // Ustaw zmodyfikowaną wartość organizatora w wydarzeniu
         eventToUpdate.setOrganizer(organizerToUpdate);
-        eventToUpdate.setModifyDate(LocalDateTime.now()); // ustawienie pola modifyDate
+        eventToUpdate.setModifiedDate(LocalDateTime.now()); // ustawienie pola modifyDate
         EventEntity updatedEvent = eventRepository.save(eventToUpdate);
         return eventMapper.toDto(updatedEvent);
+    }
+
+    public void updateEventStatus(Long eventId) {
+        EventEntity eventEntity = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalStateException(EVENT_WITH_ID_DOES_NOT_EXIST));
+
+        LocalDateTime eventStartDate = eventEntity.getEventStartDate();
+        LocalDateTime eventEndDate = eventEntity.getEventEndDate();
+        LocalDateTime now = LocalDateTime.now();
+
+        if(eventEntity.getEventStatus() == EventStatus.CANCELLED) {
+            return; // event has been cancelled, no need to update
+        } else if(eventEntity.getEventStatus() == EventStatus.POSTPONED_UPCOMING) {
+            if(now.isBefore(eventStartDate)) {
+                eventEntity.setEventStatus(EventStatus.UPCOMING);
+            } else {
+                return; // event is postponed, no need to update unless it's upcoming
+            }
+        } else if (now.isBefore(eventStartDate)) {
+            eventEntity.setEventStatus(EventStatus.UPCOMING);
+        } else if (now.isAfter(eventEndDate)) {
+            eventEntity.setEventStatus(EventStatus.FINISHED);
+        } else {
+            eventEntity.setEventStatus(EventStatus.IN_PROGRESS);
+        }
+        eventRepository.save(eventEntity);
     }
     private EventDto mapEventToDto(EventEntity eventEntity) {
         EventDto eventDto = new EventDto();
@@ -171,8 +244,8 @@ public class EventService {
         eventDto.setDescription(eventEntity.getDescription());
         eventDto.setEventStartDate(eventEntity.getEventStartDate());
         eventDto.setEventEndDate(eventEntity.getEventEndDate());
-        eventDto.setCreateDate(eventEntity.getCreateDate());
-        eventDto.setModifyDate(eventEntity.getModifyDate());
+        eventDto.setCreatedDate(eventEntity.getCreatedDate());
+        eventDto.setModifiedDate(eventEntity.getModifiedDate());
         eventDto.setPlaceToDto(eventEntity.getPlace());
         eventDto.setOrganizerToDto(eventEntity.getOrganizer());
         eventDto.setCategory(eventEntity.getCategory());
