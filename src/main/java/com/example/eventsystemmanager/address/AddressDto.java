@@ -100,4 +100,21 @@ public class AddressDto {
                 modifiedDate
         );
     }
+
+    public static AddressDto fromAddressEntity(AddressEntity addressEntity) {
+        AddressDto addressDto = new AddressDto();
+        addressDto.setId(addressEntity.getId());
+        addressDto.setCountry(addressEntity.getCountry());
+        addressDto.setCity(addressEntity.getCity());
+        addressDto.setStreet(addressEntity.getStreet());
+        addressDto.setBuildingNumber(addressEntity.getBuildingNumber());
+        addressDto.setLocalNumber(addressEntity.getLocalNumber());
+        addressDto.setPostCode(addressEntity.getPostCode());
+        addressDto.setAddressType(addressEntity.getAddressType());
+        addressDto.setCreatedDate(addressEntity.getCreatedDate());
+        addressDto.setModifiedDate(addressEntity.getModifiedDate());
+
+        return addressDto;
+    }
+
 }
