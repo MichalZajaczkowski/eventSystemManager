@@ -181,13 +181,20 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<UserDto> getUsersByStatusName(String statusName) {
+    public Map<String, Object> getUsersByStatusName(String statusName) {
         UserStatus userStatus = UserStatus.fromName(statusName);
         List<UserEntity> users = userRepository.findByUserStatus(userStatus);
-        return users.stream()
+        List<UserDto> userDtoSimples = users
+                .stream()
                 .map(this::mapUserToDtoSimple)
                 .collect(Collectors.toList());
+        Map<String, Object> result = new HashMap<>();
+        result.put("status", statusName);
+        result.put("users", userDtoSimples);
+        result.put("total", userDtoSimples.size());
+        return result;
     }
+
 
     public List<UserDto> getUsersByStatusValue(Integer statusValue) {
         UserStatus userStatus = UserStatus.fromValue(statusValue);

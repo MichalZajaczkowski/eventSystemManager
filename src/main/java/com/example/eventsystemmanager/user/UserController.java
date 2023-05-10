@@ -52,12 +52,12 @@ public class UserController {
         return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
     @GetMapping("/status/name/{statusName}")
-    public ResponseEntity<List<UserDto>> getUsersByStatusName(@PathVariable String statusName) {
-        List<UserDto> user = userService.getUsersByStatusName(statusName);
-        if (user.isEmpty()) {
+    public ResponseEntity<Map<String, Object>> getUsersByStatusName(@PathVariable String statusName) {
+        Map<String, Object> usersMap = userService.getUsersByStatusName(statusName);
+        if (usersMap.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
-            return new ResponseEntity<>( user, HttpStatus.OK);
+            return ResponseEntity.ok(usersMap);
         }
     }
     @GetMapping("/status/value/{statusValue}")
