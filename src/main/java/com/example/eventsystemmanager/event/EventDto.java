@@ -31,14 +31,13 @@ public class EventDto {
     @NotNull(message = "Place cannot be null")
     private PlaceDto place;
 
-    @NotNull(message = "Organizer cannot be null")
     private OrganizerDto organizer;
 
     @NotNull(message = "Category cannot be null")
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @NotNull(message = "Event status cannot be null")
+
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 
@@ -60,11 +59,11 @@ public class EventDto {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventEndDate;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime modifyDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
 
     public void setPlaceToDto (PlaceEntity placeEntity) {
         this.place = new PlaceDto(placeEntity);
@@ -73,24 +72,4 @@ public class EventDto {
     public void setOrganizerToDto(OrganizerEntity organizerEntity) {
         this.organizer = new OrganizerDto(organizerEntity);
     }
-
-//    public void setCategoryToDto(CategoryEntity categoryEntity) {
-//        this.category = new CategoryDto(categoryEntity);
-//    }
-
-//    public EventEntity toEventEntity() {
-//        return new EventEntity(
-//                id,
-//                place.toPlaceEntity(),
-//                organizer.toOrganizerEntity(),
-//                EventStatus.UPCOMING,
-//                Category.fromName(name),
-//                name,
-//                description,
-//                eventStartDate,
-//                eventEndDate,
-//                createDate,
-//                modifyDate
-//        );
-//    }
 }
