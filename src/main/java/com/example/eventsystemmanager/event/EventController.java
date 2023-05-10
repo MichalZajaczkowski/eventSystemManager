@@ -1,14 +1,22 @@
 package com.example.eventsystemmanager.event;
 
+import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.place.PlaceDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -29,6 +37,22 @@ public class EventController {
     public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
         EventDto createdEvent = eventService.createEvent(eventDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
+    }
+
+    @PostMapping("/createByOrganizer")
+    @Operation(summary = "Create event by organizer", description = "Create a new event by organizer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Event created successfully",
+                    content = @Content(schema = @Schema(implementation = EventDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Organizer not found"),
+            @ApiResponse(responseCode = "500", description = "An error occurred while creating the event")
+    })
+    public ResponseEntity<EventDto> createEventByOrganizer(@RequestBody @Valid EventDto eventDto,
+                                                           @RequestParam(required = false) Long organizerId,
+                                                           @RequestParam(required = false) String organizerName) {
+        EventDto createdEvent = eventService.createEventByOrganizer(eventDto, organizerId, organizerName);
+        return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{eventId}/modifyEvent")
@@ -74,5 +98,10 @@ public class EventController {
         }
     }
 
+    @PutMapping("/{eventId}/status")
+    public ResponseEntity<Void> updateEventStatus(@PathVariable Long eventId) {
+        eventService.updateEventStatus(eventId);
+        return ResponseEntity.noContent().build();
+    }
 }
 
