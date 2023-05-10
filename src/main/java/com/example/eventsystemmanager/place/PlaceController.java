@@ -8,9 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -22,7 +27,10 @@ public class PlaceController {
     private final AddressMapper addressMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<PlaceDto> save(@RequestBody PlaceDto placeDto) {
+    public ResponseEntity<?> save(@Valid @RequestBody PlaceDto placeDto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(getErrorMessages(result));
+        }
         PlaceDto savedPlaceDto = placeService.createPlace(placeDto);
         log.info("Log: Place was created");
         return new ResponseEntity<>(placeDto, HttpStatus.CREATED);
@@ -42,16 +50,19 @@ public class PlaceController {
     }
 
     @PutMapping("/{placeId}/updatePlaceData")
-    public ResponseEntity<PlaceDto> updatePlaceData(@PathVariable Long placeId,@RequestBody PlaceDto placeDto) {
+    public ResponseEntity<?> updatePlaceData(@PathVariable Long placeId, @Valid @RequestBody PlaceDto placeDto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(getErrorMessages(result));
+        }
         placeService.updatePlaceData(placeId, placeDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping("/{placeId}/partialUpdatePlaceData")
-    public ResponseEntity<PlaceDto> partialUpdatePlaceData(@PathVariable Long placeId,@RequestBody PlaceDto placeDto) {
-        placeService.partialUpdatePlaceData(placeId, placeDto);
+    public ResponseEntity<Map<String, Object>> partialUpdatePlaceData(@PathVariable Long placeId, @Valid @RequestBody PlaceDto placeDto) {
+        Map<String, Object> changedFields = placeService.partialUpdatePlaceData(placeId, placeDto);
         log.debug("Log: Place was updated");
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(changedFields, HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/{placeId}/updateAddressForPlace")
@@ -64,6 +75,14 @@ public class PlaceController {
         placeService.removePlace(id);
         log.debug("log: Place removed successfully.");
         return ResponseEntity.noContent().build();
+    }
+
+    private List<String> getErrorMessages(BindingResult result) {
+        List<String> errorMessages = new ArrayList<>();
+        for (FieldError error : result.getFieldErrors()) {
+            errorMessages.add(error.getDefaultMessage());
+        }
+        return errorMessages;
     }
 
 }
