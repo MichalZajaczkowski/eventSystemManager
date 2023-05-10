@@ -4,12 +4,14 @@ import com.example.eventsystemmanager.address.AddressDto;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -20,23 +22,40 @@ import javax.validation.constraints.NotBlank;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
-    @NotBlank
     private Long id;
-    @NotBlank
+
+    @Valid
+    @NotNull(message = "User address cannot be null")
     private AddressDto userAddress;
-    @NotBlank
+
+    @NotBlank(message = "Username cannot be blank")
     private String userName;
-    @NotBlank
+
+    @NotBlank(message = "User surname cannot be blank")
     private String userSurname;
-    @NotBlank
+
+    @NotBlank(message = "Login cannot be blank")
     private String login;
-    @NotBlank
+
+    @NotBlank(message = "Password cannot be blank")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
-    @Email
+
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
+
+    @Pattern(regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "Invalid phone number format")
     private String phone;
+
     private UserStatus userStatus;
     private AddressType addressType;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
 
     public UserDto(Long id, String userName, String userSurname) {
         this.id = id;
@@ -59,9 +78,29 @@ public class UserDto {
                 password,
                 email,
                 phone,
-                UserStatus.NIEAKTYWNY
+                UserStatus.NIEAKTYWNY,
+                createdDate,
+                modifiedDate
         );
     }
+
+    public static UserDto fromUserEntity(UserEntity userEntity) {
+        UserDto userDto = new UserDto();
+        userDto.setId(userEntity.getId());
+        userDto.setUserAddress(AddressDto.fromAddressEntity(userEntity.getAddressEntity()));
+        userDto.setUserName(userEntity.getUserName());
+        userDto.setUserSurname(userEntity.getUserSurname());
+        userDto.setLogin(userEntity.getLogin());
+        userDto.setPassword(userEntity.getPassword());
+        userDto.setEmail(userEntity.getEmail());
+        userDto.setPhone(userEntity.getPhone());
+        userDto.setUserStatus(userEntity.getUserStatus());
+        userDto.setCreatedDate(userEntity.getCreatedDate());
+        userDto.setModifiedDate(userEntity.getModifiedDate());
+
+        return userDto;
+    }
+
     public void setUserAddressToDto(AddressEntity addressEntity) {
         this.userAddress = new AddressDto(addressEntity);
     }
