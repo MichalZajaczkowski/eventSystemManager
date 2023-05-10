@@ -13,7 +13,10 @@ import org.modelmapper.convention.NamingConventions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,13 +26,11 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @Service
 public class UserService {
 
-    private static final String USERADDRESSWITHIDSTATEMENT = "UserAddress with id " + id + " does not exist.";
+    private static final String USER_WITH_ID = "User with id ";
+    private static final String DOES_NOT_EXIST = " does not exist.";
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
-
-    private final StatusRepository statusRepository;
     private final UserMapper userMapper;
-
     private final AddressMapper addressMapper;
     private final ModelMapper modelMapper;
 
@@ -45,78 +46,83 @@ public class UserService {
     public List<UserDto> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(this::mapUserToDto)
+                .map(userMapper::userMapToDto)
                 .toList();
     }
 
     public UserDto findById(Long id) {
         return userRepository.findById(id)
-                .map(this::mapUserToDto)
-                .orElseThrow(() -> new IllegalArgumentException(USERADDRESSWITHIDSTATEMENT));
+                .map(userMapper::userMapToDto)
+                .orElseThrow(() -> new IllegalArgumentException(USER_WITH_ID + id + DOES_NOT_EXIST));
     }
 
     public UserDto createUser(UserDto userDto) {
         UserEntity userEntity = userDto.toUserEntity();
 
         if (userDto.getUserAddress() != null) {
-            AddressDto addressDto = userDto.getUserAddress();
-
-            // Check if an address with the same fields already exists in the database
-            AddressEntity existingAddress = addressRepository.findByAddressFields(
-                    addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(),
-                    addressDto.getBuildingNumber(), addressDto.getLocalNumber(), addressDto.getPostCode(),
-                    AddressType.USER_ADDRESS);
-
-            if (existingAddress != null) {
-                // Set the existing user address id for the user
-                userEntity.setAddressEntity(existingAddress);
-            } else {
-                // Create a new user address with a new id
-                AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
-                newAddress.setAddressType(AddressType.USER_ADDRESS);
-                newAddress = addressRepository.save(newAddress);
-                userEntity.setAddressEntity(newAddress);
-            }
+            userEntity.setAddressEntity(processUserAddress(userDto.getUserAddress()));
         }
-        userRepository.save(userEntity);
-        return userDto;
+
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        if (savedUserEntity == null) {
+            throw new RuntimeException("Failed to save user.");
+        }
+
+        return UserDto.fromUserEntity(savedUserEntity);
     }
 
+    private AddressEntity processUserAddress(AddressDto addressDto) {
+        // Check if an address with the same fields already exists in the database
+        AddressEntity existingAddress = addressRepository.findByAddressFields(
+                addressDto.getCountry(), addressDto.getCity(), addressDto.getStreet(),
+                addressDto.getBuildingNumber(), addressDto.getLocalNumber(), addressDto.getPostCode(),
+                AddressType.USER_ADDRESS);
 
-    public void updateUser(UserDto userDto) {
-        if (userRepository.findById(userDto.getId()).isEmpty()) {
-            throw new IllegalArgumentException(USERADDRESSWITHIDSTATEMENT);
-        } else if (addressRepository.findById(userDto.getUserAddress().getId()).isEmpty()) {
-            throw new IllegalArgumentException("User address with id " + userDto.getUserAddress().getId() + " does not exist");
+        if (existingAddress != null) {
+            // An address with the same fields already exists, so return it
+            return existingAddress;
         } else {
-            addressRepository.save(userDto.getUserAddress().toAddressEntity());
+            // No address with the same fields exists, so create a new one
+            AddressEntity newAddress = addressMapper.addressMapToEntity(addressDto);
+            newAddress.setAddressType(AddressType.USER_ADDRESS);
+            return addressRepository.save(newAddress);
         }
-        userRepository.save(userDto.toUserEntity());
     }
 
-    public void partialUpdateUser(UserDto userDto) {
+    public Map<String, Object> partialUpdateUser(UserDto userDto) {
         UserEntity userEntity = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + userDto.getId() + " does not exist"));
+        Map<String, Object> changedFields = new HashMap<>();
+
         if (userDto.getUserName() != null) {
             userEntity.setUserName(userDto.getUserName());
+            changedFields.put("userName", userDto.getUserName());
         }
         if (userDto.getUserSurname() != null) {
             userEntity.setUserSurname(userDto.getUserSurname());
+            changedFields.put("userSurname", userDto.getUserSurname());
         }
         if (userDto.getLogin() != null) {
             userEntity.setLogin(userDto.getLogin());
+            changedFields.put("login", userDto.getLogin());
         }
         if (userDto.getPassword() != null) {
             userEntity.setPassword(userDto.getPassword());
+            changedFields.put("password", userDto.getPassword());
         }
         if (userDto.getEmail() != null) {
             userEntity.setEmail(userDto.getEmail());
+            changedFields.put("email", userDto.getEmail());
         }
         if (userDto.getPhone() != null) {
             userEntity.setPhone(userDto.getPhone());
+            changedFields.put("phone", userDto.getPhone());
         }
+        userEntity.setModifiedDate(LocalDateTime.now());
         userRepository.save(userEntity);
+        return changedFields;
     }
+
 
     public AddressEntity updateAddressForUser(Long userId, AddressDto addressDto) {
         UserEntity user = userRepository.findById(userId)
@@ -169,7 +175,8 @@ public class UserService {
     }
 
     public void setStatus(UserDto userDto, UserStatus userStatus) {
-        UserEntity user = userRepository.findById(userDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found."));
+        UserEntity user = userRepository.findById(userDto.getId()).orElseThrow(() ->
+                new IllegalArgumentException("User not found."));
         user.setUserStatus(userStatus);
         userRepository.save(user);
     }
@@ -189,34 +196,6 @@ public class UserService {
                 .map(this::mapUserToDtoSimple)
                 .collect(Collectors.toList());
     }
-
-
-    private UserDto mapUserToDto(UserEntity userEntity) {
-        UserDto userDto = new UserDto();
-        userDto.setId(userEntity.getId());
-        userDto.setUserName(userEntity.getUserName());
-        userDto.setUserSurname(userEntity.getUserSurname());
-        userDto.setLogin(userEntity.getLogin());
-        userDto.setPassword(userEntity.getPassword());
-        userDto.setEmail(userEntity.getEmail());
-        userDto.setPhone(userEntity.getPhone());
-        userDto.setUserAddressToDto(userEntity.getAddressEntity());
-        userDto.setUserStatus(userEntity.getUserStatus());
-        return userDto;
-    }
-
-    private AddressEntity mapToUserAddressEntity(AddressDto addressDto) {
-        return AddressEntity.builder()
-                .id(addressDto.getId())
-                .country(addressDto.getCountry())
-                .city(addressDto.getCity())
-                .street(addressDto.getStreet())
-                .buildingNumber(addressDto.getBuildingNumber())
-                .localNumber(addressDto.getLocalNumber())
-                .postCode(addressDto.getPostCode())
-                .build();
-    }
-
     private UserDto mapUserToDtoSimple(UserEntity userEntity) {
         UserDto userDto = new UserDto();
         userDto.setId(userEntity.getId());

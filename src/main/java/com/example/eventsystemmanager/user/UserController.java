@@ -5,6 +5,7 @@ import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.AddressMapper;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
 import com.example.eventsystemmanager.user.userStatus.UserStatusDto;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -43,7 +45,7 @@ public class UserController {
             return ResponseEntity.ok(user);
         }
     }
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/userId")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto user = userService.findById(id);
         log.info("User found: " + userService.findById(id));
@@ -81,12 +83,15 @@ public class UserController {
         return new ResponseEntity<>(userDto, HttpStatus.CREATED);
         //return ResponseEntity.created(URI.create("/api/v1/users/" + savedUserDto.getId())).body(savedUserDto);
     }
-    @PatchMapping()
-    public ResponseEntity<UserDto> partialUpdateUser(@RequestBody UserDto userDto) {
-        userService.partialUpdateUser(userDto);
-        log.info("Log: User was updated");
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    @PatchMapping("/{userId}")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public ResponseEntity<Map<String, Object>> partialUpdateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        userDto.setId(userId);  // Ensure the ID in DTO is the same as the path variable
+        Map<String, Object> changedFields = userService.partialUpdateUser(userDto);
+        log.info("User was updated to " + changedFields);
+        return new ResponseEntity<>(changedFields, HttpStatus.OK);
     }
+
     @PutMapping("/{userId}/address")
     public ResponseEntity<AddressDto> updateUserAddress(@PathVariable Long userId, @RequestBody AddressDto addressDto) {
         AddressEntity updatedAddress = userService.updateAddressForUser(userId, addressDto);
@@ -95,11 +100,6 @@ public class UserController {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-    @PutMapping()
-    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto) {
-        userService.updateUser(userDto);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
     @ApiOperation(value = "Changes user status", notes = "Changes status of user with specified ID")
     @ApiResponses(value = {
