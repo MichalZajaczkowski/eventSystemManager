@@ -60,7 +60,7 @@ public class EventService {
             if (eventDto.getOrganizer() != null) {
                 OrganizerEntity organizerEntity = organizerRepository.findOrgByName(eventDto.getOrganizer().getName());
                 if (organizerEntity == null) {
-                    OrganizerDto organizerDto = organizerService.createOrganizer(eventDto.getOrganizer());
+                    organizerService.createOrganizer(eventDto.getOrganizer());
                     organizerEntity = organizerRepository.findOrgByName(eventDto.getOrganizer().getName());
                 }
                 eventEntity.setOrganizer(organizerEntity);
@@ -70,11 +70,15 @@ public class EventService {
             throw e;
         }
 
+        return getEventDto(eventDto, eventEntity);
+    }
+
+    private EventDto getEventDto(@NotNull @Valid EventDto eventDto, EventEntity eventEntity) {
         try {
             if (eventDto.getPlace() != null) {
                 PlaceEntity placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
                 if (placeEntity == null) {
-                    PlaceDto placeDto = placeService.createPlace(eventDto.getPlace());
+                    placeService.createPlace(eventDto.getPlace());
                     placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
                 }
                 eventEntity.setPlace(placeEntity);
@@ -115,30 +119,7 @@ public class EventService {
             throw e;
         }
 
-        try {
-            if (eventDto.getPlace() != null) {
-                PlaceEntity placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
-                if (placeEntity == null) {
-                    PlaceDto placeDto = placeService.createPlace(eventDto.getPlace());
-                    placeEntity = placeRepository.findByName(eventDto.getPlace().getName());
-                }
-                eventEntity.setPlace(placeEntity);
-            }
-        } catch (PlaceNotFoundException e) {
-            log.error("Place not found: {}", e.getMessage());
-            throw e;
-        }
-
-        eventEntity.setEventStatus(EventStatus.UPCOMING);
-        eventEntity.setCreatedDate(LocalDateTime.now());
-
-        try {
-            EventEntity savedEvent = eventRepository.save(eventEntity);
-            return eventMapper.toDto(savedEvent);
-        } catch (Exception e) {
-            log.error("Error while saving event: {}", e.getMessage());
-            throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
-        }
+        return getEventDto(eventDto, eventEntity);
     }
 
 
