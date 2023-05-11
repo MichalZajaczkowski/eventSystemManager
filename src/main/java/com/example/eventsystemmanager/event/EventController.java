@@ -1,6 +1,5 @@
 package com.example.eventsystemmanager.event;
 
-import com.example.eventsystemmanager.event.eventStatus.EventStatus;
 import com.example.eventsystemmanager.exception.EventNotFoundException;
 import com.example.eventsystemmanager.organizer.OrganizerDto;
 import com.example.eventsystemmanager.place.PlaceDto;
@@ -10,14 +9,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -33,7 +31,7 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/createEvent")
     public ResponseEntity<EventDto> createEvent(@RequestBody EventDto eventDto) {
         EventDto createdEvent = eventService.createEvent(eventDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
@@ -55,23 +53,20 @@ public class EventController {
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{eventId}/modifyEvent")
-    public ResponseEntity<EventDto> modifyEvent(@PathVariable Long eventId, @RequestBody EventDto eventDto) {
+    @PatchMapping("/{eventId}/partialUpdateEventsData")
+    public ResponseEntity<EventDto> partialUpdateEventsData(@PathVariable Long eventId, @RequestBody EventDto eventDto) {
         eventDto.setId(eventId);
         EventDto updatedEvent = eventService.partialUpdateEventsData(eventId, eventDto);
         log.debug("Log: Event was updated");
         return new ResponseEntity<>(updatedEvent, HttpStatus.ACCEPTED);
     }
-    @PatchMapping("/{eventId}/updatePlace")
-    public ResponseEntity<EventDto> updatePlace(@PathVariable Long eventId, @RequestBody PlaceDto placeId) {
-        EventDto updatedEvent = eventService.updatePlaceForEvent(eventId, placeId);
+    @PatchMapping("/{eventId}/updatePlaceForEvent")
+    public ResponseEntity<EventDto> updatePlaceForEvent(@PathVariable Long eventId, @RequestBody PlaceDto place) {
+        EventDto updatedEvent = eventService.updatePlaceForEvent(eventId, place);
         return ResponseEntity.ok(updatedEvent);
     }
-
-
-
-    @PatchMapping("/{eventId}/updateOrganizer")
-    public ResponseEntity<EventDto> updateOrganizer(@PathVariable Long eventId, @RequestBody OrganizerDto organizerId) {
+    @PatchMapping("/{eventId}/updateOrganizerForEvent")
+    public ResponseEntity<EventDto> updateOrganizerForEvent(@PathVariable Long eventId, @RequestBody OrganizerDto organizerId) {
         EventDto updatedEvent = eventService.updateOrganizerForEvent(eventId, organizerId);
         return ResponseEntity.ok(updatedEvent);
     }
@@ -89,7 +84,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventDto> getEventById(@PathVariable Long id) throws EventNotFoundException {
+    public ResponseEntity<EventDto> findById(@PathVariable Long id) throws EventNotFoundException {
         try {
             EventDto event = eventService.findById(id);
             return ResponseEntity.ok(event);
@@ -98,9 +93,22 @@ public class EventController {
         }
     }
 
-    @PutMapping("/{eventId}/status")
-    public ResponseEntity<Void> updateEventStatus(@PathVariable Long eventId) {
-        eventService.updateEventStatus(eventId);
+    @PutMapping("/{eventId}/updateSingleEventStatus")
+    public ResponseEntity<Void> updateSingleEventStatus(@PathVariable Long eventId) {
+        eventService.updateSingleEventStatus(eventId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/updateAllEventStatus")
+    public ResponseEntity<Void> updateAllEventStatus() {
+        eventService.updateAllEventStatus();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{eventId}/setStatus")
+    public ResponseEntity<Void> setStatus(@PathVariable Long eventId, @RequestBody Map<String, String> request) {
+        String status = request.get("status");
+        eventService.setStatus(eventId, status);
         return ResponseEntity.noContent().build();
     }
 }
