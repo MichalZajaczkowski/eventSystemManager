@@ -55,12 +55,22 @@ public class EventEntity {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventEndDate;
 
-    @Column(name = "date_of_creat")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createDate;
+    @Column(name = "created_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
 
-    @Column(name = "date_of_modification")
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime modifyDate;
+    @Column(name = "modified_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
+
+    @PrePersist
+    public void onCreate() {
+        createdDate = LocalDateTime.now();
+        modifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifiedDate = LocalDateTime.now();
+    }
 }
-// TODO: 02.05.2023 rozbicie dat na daty i czas osobno

@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.NonUniqueResultException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -84,23 +87,38 @@ public class PlaceService {
         placeRepository.save(placeToUpdate);
     }
 
-    public void partialUpdatePlaceData(Long placeId, PlaceDto placeDto) {
+    public Map<String, Object> partialUpdatePlaceData(Long placeId, PlaceDto placeDto) {
         PlaceEntity placeToUpdate = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalStateException(PLACE_WITH_ID_DOES_NOT_EXIST));
+
+        Map<String, Object> changedFields = new HashMap<>();
+
         if (placeDto.getName() != null) {
             placeToUpdate.setName(placeDto.getName());
+            changedFields.put("name", placeDto.getName());
         }
+
         if (placeDto.getShortName() != null) {
             placeToUpdate.setShortName(placeDto.getShortName());
+            changedFields.put("shortName", placeDto.getShortName());
         }
+
         if (placeDto.getDescription() != null) {
             placeToUpdate.setDescription(placeDto.getDescription());
+            changedFields.put("description", placeDto.getDescription());
         }
+
         if (placeDto.getQuantityAvailablePlaces() != null) {
             placeToUpdate.setQuantityAvailablePlaces(placeDto.getQuantityAvailablePlaces());
+            changedFields.put("quantityAvailablePlaces", placeDto.getQuantityAvailablePlaces());
         }
+
+        placeToUpdate.setModifiedDate(LocalDateTime.now());
         placeRepository.save(placeToUpdate);
+
+        return changedFields;
     }
+
 
     public AddressEntity updateAddressForPlace(Long placeId, AddressDto addressDto) {
         PlaceEntity placeAddressToUpdate = placeRepository.findById(placeId)

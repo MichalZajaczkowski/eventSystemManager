@@ -3,9 +3,11 @@ package com.example.eventsystemmanager.user;
 import com.example.eventsystemmanager.address.AddressEntity;
 import com.example.eventsystemmanager.address.addressType.AddressType;
 import com.example.eventsystemmanager.user.userStatus.UserStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,14 +44,36 @@ public class UserEntity {
 
     @Column(name = "phone")
     private String phone;
+
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-//    @Enumerated(EnumType.STRING)
-//    private AddressType addressType;
+    @Column(name = "created_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
+
+    public UserEntity(String userName, String userSurname) {
+        this.userName = userName;
+        this.userSurname = userSurname;
+        // set other fields to default values
+    }
 
     public Long getUserAddressEntityId() {
         return addressEntity.getId();
     }
+
+    @PrePersist
+    public void onCreate() {
+        createdDate = LocalDateTime.now();
+        modifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifiedDate = LocalDateTime.now();
+    }
 }
-// TODO: 29.04.2023 add date of creat and mod user

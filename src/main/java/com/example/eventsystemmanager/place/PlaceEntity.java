@@ -1,6 +1,7 @@
 package com.example.eventsystemmanager.place;
 
 import com.example.eventsystemmanager.address.AddressEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,6 +44,25 @@ public class PlaceEntity {
 
     @Size(min = 10,max = 1000, message = "Enter a description")
     private String description;
+
     private Integer quantityAvailablePlaces;
+
+    @Column(name = "created_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
+
+    @PrePersist
+    public void onCreate() {
+        createdDate = LocalDateTime.now();
+        modifiedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        modifiedDate = LocalDateTime.now();
+    }
 }
-// TODO: 29.04.2023 add date of creat and mod place

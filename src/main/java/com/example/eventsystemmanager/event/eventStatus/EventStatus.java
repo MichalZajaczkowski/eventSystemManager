@@ -2,8 +2,8 @@ package com.example.eventsystemmanager.event.eventStatus;
 
 public enum EventStatus {
     UPCOMING(0, "upcoming", "Event is upcoming"),
-    ACTIVE(1, "active", "Event is active"),
-    POSTPONED(2, "postponed", "Event has been postponed"),
+    IN_PROGRESS(1, "in progres ", "Event has in progres"),
+    POSTPONED_UPCOMING(2, "postponed/upcoming", "Event has been postponed"),
     CANCELLED(3, "cancelled", "Event has been cancelled"),
     FINISHED(4, "finished", "Event has finished");
     private final Integer value;

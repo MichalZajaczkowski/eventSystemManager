@@ -1,41 +1,68 @@
 package com.example.eventsystemmanager.address;
 
 import com.example.eventsystemmanager.address.addressType.AddressType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AddressDto {
 
-    @NotBlank
     @JsonIgnore
     private Long id;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String country;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String city;
+
     @NotBlank
+    @Size(min = 2, max = 100)
     private String street;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer buildingNumber;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer localNumber;
-    @NotBlank
+
+    @NotNull
+    @Min(1)
+    @Max(9999)
     private Integer postCode;
+
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedDate;
+
     public AddressDto(AddressEntity addressEntity) {
+        if (addressEntity == null) {
+            throw new IllegalArgumentException("AddressEntity cannot be null");
+        }
         this.id = addressEntity.getId();
         this.country = addressEntity.getCountry();
         this.city = addressEntity.getCity();
@@ -43,6 +70,9 @@ public class AddressDto {
         this.buildingNumber = addressEntity.getBuildingNumber();
         this.localNumber = addressEntity.getLocalNumber();
         this.postCode = addressEntity.getPostCode();
+        this.addressType = addressEntity.getAddressType();
+        this.createdDate = addressEntity.getCreatedDate();
+        this.modifiedDate = addressEntity.getModifiedDate();
     }
 
     public AddressDto(Long id) {
@@ -65,7 +95,26 @@ public class AddressDto {
                 buildingNumber,
                 localNumber,
                 postCode,
-                addressType
+                addressType,
+                createdDate,
+                modifiedDate
         );
     }
+
+    public static AddressDto fromAddressEntity(AddressEntity addressEntity) {
+        AddressDto addressDto = new AddressDto();
+        addressDto.setId(addressEntity.getId());
+        addressDto.setCountry(addressEntity.getCountry());
+        addressDto.setCity(addressEntity.getCity());
+        addressDto.setStreet(addressEntity.getStreet());
+        addressDto.setBuildingNumber(addressEntity.getBuildingNumber());
+        addressDto.setLocalNumber(addressEntity.getLocalNumber());
+        addressDto.setPostCode(addressEntity.getPostCode());
+        addressDto.setAddressType(addressEntity.getAddressType());
+        addressDto.setCreatedDate(addressEntity.getCreatedDate());
+        addressDto.setModifiedDate(addressEntity.getModifiedDate());
+
+        return addressDto;
+    }
+
 }
