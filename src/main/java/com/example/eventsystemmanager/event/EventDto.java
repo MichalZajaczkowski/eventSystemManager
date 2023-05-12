@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDto {
 
