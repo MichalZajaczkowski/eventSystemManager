@@ -73,6 +73,30 @@ public class EventService {
         return getEventDto(eventDto, eventEntity);
     }
 
+
+
+    @Transactional
+    public EventDto createEventByOrganizer(@NotNull @Valid EventDto eventDto, Long organizerId, String organizerName) {
+        EventEntity eventEntity = eventMapper.toEntity(eventDto);
+
+        try {
+            OrganizerEntity organizerEntity = null;
+            if (organizerId != null) {
+                organizerEntity = organizerRepository.findById(organizerId).orElseThrow(() ->
+                        new OrganizerNotFoundException("Organizer with id " + organizerId + " does not exist"));
+            } else if (organizerName != null) {
+                organizerEntity = organizerRepository.findByName(organizerName).orElseThrow(() ->
+                        new OrganizerNotFoundException("Organizer with name " + organizerName + " does not exist"));
+            }
+            eventEntity.setOrganizer(organizerEntity);
+        } catch (OrganizerNotFoundException e) {
+            log.error("Organizer not found: {}", e.getMessage());
+            throw e;
+        }
+
+        return getEventDto(eventDto, eventEntity);
+    }
+
     private EventDto getEventDto(@NotNull @Valid EventDto eventDto, EventEntity eventEntity) {
         try {
             if (eventDto.getPlace() != null) {
@@ -98,28 +122,6 @@ public class EventService {
             log.error("Error while saving event: {}", e.getMessage());
             throw new EventSaveException("Error while saving event: " + e.getMessage(), e);
         }
-    }
-
-    @Transactional
-    public EventDto createEventByOrganizer(@NotNull @Valid EventDto eventDto, Long organizerId, String organizerName) {
-        EventEntity eventEntity = eventMapper.toEntity(eventDto);
-
-        try {
-            OrganizerEntity organizerEntity = null;
-            if (organizerId != null) {
-                organizerEntity = organizerRepository.findById(organizerId).orElseThrow(() ->
-                        new OrganizerNotFoundException("Organizer with id " + organizerId + " does not exist"));
-            } else if (organizerName != null) {
-                organizerEntity = organizerRepository.findByName(organizerName).orElseThrow(() ->
-                        new OrganizerNotFoundException("Organizer with name " + organizerName + " does not exist"));
-            }
-            eventEntity.setOrganizer(organizerEntity);
-        } catch (OrganizerNotFoundException e) {
-            log.error("Organizer not found: {}", e.getMessage());
-            throw e;
-        }
-
-        return getEventDto(eventDto, eventEntity);
     }
 
 
